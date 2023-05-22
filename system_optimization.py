@@ -59,8 +59,14 @@ m.setObjective(ni.sum(0, '*', '*'), GRB.MINIMIZE)
 # Please note that because of Gurobi's zero-based indexing, you might need to adjust the indices
 
 
-# for i in V:
-#     m.addConstr(ni[0, i, 10] == 100)
+        
+for i in range(11):
+    if i != 10:
+        m.addConstr(ni[0, 0, i] == 0)
+        m.addConstr(ni[0, 1, i] == 0)
+        m.addConstr(ni[0, 2, i] == 0)
+
+
 
 # Here, the indices are not adjusted
 for i in V:
