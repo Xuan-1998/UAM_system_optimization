@@ -19,8 +19,9 @@ gamma = [3.047619048, 3.047619048, 3.237872699, 3.729470167, 4.404786588, 5.3799
 # Example 'schedule.csv' data loading (Please replace with actual file loading if needed)
 # Here, it is simply initialized with zeros.
 # initial
-f_values = [[[0, 0], [0, 0]] for _ in range(T)]
-data = pd.read_csv('schedule.csv')
+
+f_values = np.zeros((T, 2, 2))
+data = pd.read_csv('input/schedule.csv')
 LAX_DTLA = data[data['od'] == 'LAX_DTLA']
 DTLA_LAX = data[data['od'] == 'DTLA_LAX']
 # Create the list of lists
