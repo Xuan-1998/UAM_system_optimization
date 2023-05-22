@@ -28,6 +28,19 @@ uij = LpVariable.dicts("u", [(t, i, j, k) for t in range(T+1) for i in V for j i
 
 
 
+# Set non-negativity and integer constraints for ni and uij
+for t in range(T + 1):
+    for i in V:
+        for k in range(K + 1):
+            ni[(t, i, k)].cat = LpInteger  # Set ni variables as integers
+
+for t in range(T + 1):
+    for i in V:
+        for j in V:
+            if i != j:
+                for k in range(K + 1):
+                    uij[(t, i, j, k)].cat = LpInteger  # Set uij variables as integers
+
 # initial
 f_values = np.zeros((T, 2, 2))
 data = pd.read_csv('schedule.csv')
@@ -110,5 +123,4 @@ for v in prob.variables():
 
 # The optimized objective function value is printed to the console
 print("Total Fleet Size = ", value(prob.objective))
-
 
