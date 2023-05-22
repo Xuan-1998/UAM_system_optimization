@@ -7,18 +7,25 @@ T = int(1440 / 10)
 K = 10
 V = [0, 1, 2]
 
+
+
+# Create a new model
+m = Model("Vertiport_Aircraft_Routing")
+
+
+# Create variables
+ni = m.addVars(((t, i, k) for t in range(T+1) for i in V for k in range(K+1)), vtype=GRB.INTEGER, name="n")
+uij = m.addVars(((t, i, j, k) for t in range(T+1) for i in V for j in V for k in range(K+1) if i != j), vtype=GRB.INTEGER, name="u")
 # Flight time matrix
-tau = [[0, 6.06667 / 10, 0], [6.06667 / 10, 0, 0], [0, 0, 0]]
+tau = [[0, 6.06667 / 10, 0], [6.06667 / 10, 0, 6.06667 / 10], [0, 6.06667 / 10, 0]]
 
 # SOC levels drop matrix
-kappa = [[0, 0.8 / 10, 0], [0.8 / 10, 0, 0], [0, 0.8 / 10, 0]]
+kappa = [[0, -0.8 / 10, 0], [-0.8 / 10, 0, -0.8 / 10], [0, -0.8 / 10, 0]]
 
 gamma = [3.047619048 / 10, 3.047619048 / 10, 3.237872699 / 10, 3.729470167 / 10, 4.404786588 / 10, 5.379957014 / 10, 6.913363091 / 10,
         9.685271742 / 10, 16.30528373 / 10, 71.41103553 / 10]
 
-# Example 'schedule.csv' data loading (Please replace with actual file loading if needed)
-# Here, it is simply initialized with zeros.
-# initial
+# f
 
 f_values = np.zeros((T, 2, 2))
 data = pd.read_csv('input/schedule.csv')
@@ -44,18 +51,7 @@ DTLA_LAX = new_array_DTLA_LAX_sum
 for t in range(T):
     f_values[t][0][1] = LAX_DTLA[t] # get the first (and only) item of the inner list
     f_values[t][1][0] = DTLA_LAX[t] # get the first (and only) item of the inner list
-print(f_values)
-
-
-
-# Create a new model
-m = Model("Vertiport_Aircraft_Routing")
-
-
-# Create variables
-ni = m.addVars(((t, i, k) for t in range(T+1) for i in V for k in range(K+1)), vtype=GRB.INTEGER, name="n")
-uij = m.addVars(((t, i, j, k) for t in range(T+1) for i in V for j in V for k in range(K+1) if i != j), vtype=GRB.INTEGER, name="u")
-
+    
 # Define the objective
 m.setObjective(ni.sum(0, '*', '*'), GRB.MINIMIZE)
 
@@ -106,6 +102,8 @@ m.update()
 
 # Solve model
 m.optimize()
+# Redirect stdout to a file
+sys.stdout = open('output.txt', 'w')
 
 if m.status == GRB.Status.INFEASIBLE:
     print('The model is infeasible; computing IIS')
@@ -116,9 +114,14 @@ if m.status == GRB.Status.INFEASIBLE:
 
 
 
+
+
 # Print results
 for v in m.getVars():
     if v.x > 0:  # Print only non-zero variables for clarity
         print('{} = {}'.format(v.varName, v.x))
 
 print('Total Fleet Size:', m.objVal)
+
+# Close the output file
+sys.stdout.close()
