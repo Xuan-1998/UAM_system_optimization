@@ -1,48 +1,25 @@
-from pulp import *
+from gurobipy import *
 import pandas as pd
 import numpy as np
 
 # Constants
-T = 1440 # For example, we can take time in hours of a day
-K = 10 # For example, we can have 5 levels of SOC
-V = [0, 1, 2] # Vertiports
+T = 1440
+K = 10
+V = [0, 1, 2]
 
 # Flight time matrix
-tau = [[0, 10, 0], [10, 0, 0], [0, 0, 0]]
+tau = [[0, 6.06667, 0], [6.06667, 0, 0], [0, 0, 0]]
 
 # SOC levels drop matrix
 kappa = [[0, 1, 0], [1, 0, 0], [0, 0, 0]]
 
 gamma = [3.047619048, 3.047619048, 3.237872699, 3.729470167, 4.404786588, 5.379957014, 6.913363091,
-        9.685271742, 16.30528373, 71.41103553]  # define gamma
+        9.685271742, 16.30528373, 71.41103553]
 
-
-
-
-# Create the 'prob' variable to contain the problem data
-prob = LpProblem("Vertiport_Aircraft_Routing", LpMinimize)
-
-# Decision variables
-ni = LpVariable.dicts("n", [(t, i, k) for t in range(T+1) for i in V for k in range(K+1)], 0, None, LpInteger)
-uij = LpVariable.dicts("u", [(t, i, j, k) for t in range(T+1) for i in V for j in V for k in range(K+1) if i != j], 0, None, LpInteger)
-
-
-
-# Set non-negativity and integer constraints for ni and uij
-for t in range(T + 1):
-    for i in V:
-        for k in range(K + 1):
-            ni[(t, i, k)].cat = LpInteger  # Set ni variables as integers
-
-for t in range(T + 1):
-    for i in V:
-        for j in V:
-            if i != j:
-                for k in range(K + 1):
-                    uij[(t, i, j, k)].cat = LpInteger  # Set uij variables as integers
-
+# Example 'schedule.csv' data loading (Please replace with actual file loading if needed)
+# Here, it is simply initialized with zeros.
 # initial
-f_values = np.zeros((T, 2, 2))
+f_values = [[[0, 0], [0, 0]] for _ in range(T)]
 data = pd.read_csv('schedule.csv')
 LAX_DTLA = data[data['od'] == 'LAX_DTLA']
 DTLA_LAX = data[data['od'] == 'DTLA_LAX']
@@ -53,74 +30,74 @@ for t in range(T):
     f_values[t][0][1] = LAX_DTLA[t][0] # get the first (and only) item of the inner list
     f_values[t][1][0] = DTLA_LAX[t][0] # get the first (and only) item of the inner list
 
-# # Make sure fi includes all valid (t, i, j) combinations
-# fi = LpVariable.dicts("f", [(t, i, j) for t in range(T) for i in range(2) for j in range(2) if i != j], 0, None, LpInteger)
-
-# # Then you can assign values like this:
-# for t in range(T):
-#     for i in range(2):
-#         for j in range(2):
-#             if i != j:  # Skip cases where i == j
-#                 fi[(t, i, j)].setInitialValue(f_values[t][i][j])
 
 
+# Create a new model
+m = Model("Vertiport_Aircraft_Routing")
 
-# Objective function
-prob += lpSum([ni[(0, i, k)] for i in V for k in range(K+1)])
+
+# Create variables
+ni = m.addVars(((t, i, k) for t in range(T+1) for i in V for k in range(K+1)), vtype=GRB.INTEGER, name="n")
+uij = m.addVars(((t, i, j, k) for t in range(T+1) for i in V for j in V for k in range(K+1) if i != j), vtype=GRB.INTEGER, name="u")
+
+# Define the objective
+m.setObjective(ni.sum(0, '*', '*'), GRB.MINIMIZE)
 
 # Constraints
+# Please note that because of Gurobi's zero-based indexing, you might need to adjust the indices
+# Here, the indices are not adjusted
 for i in V:
     for k in range(K+1):
         for t in range(T+1):
             if i != 3:
                 if t > 0:
-                    prob += ni[(t, i, k)] == ni[(t-1, i, k)] + lpSum([uij[(t-1-tau[j-1][i-1], j, i, k+kappa[j-1][i-1])] for j in V if j != i and t-1-tau[j-1][i-1] >= 0 and (t-1-tau[j-1][i-1], j, i, k+kappa[j-1][i-1]) in uij]) - lpSum([uij[(t-1, i, j, k)] for j in V if j != i and (t-1, i, j, k) in uij])
+                    m.addConstr(ni[t, i, k] == ni[t-1, i, k] + quicksum(uij[t-1-tau[j-1][i-1], j, i, k+kappa[j-1][i-1]] for j in V if j != i and t-1-tau[j-1][i-1] >= 0 and (t-1-tau[j-1][i-1], j, i, k+kappa[j-1][i-1]) in uij) - quicksum(uij[t-1, i, j, k] for j in V if j != i and (t-1, i, j, k) in uij))
                 else:
-                    prob += ni[(t, i, k)] == lpSum([uij[(t-1-tau[j-1][i-1], j, i, k+kappa[j-1][i-1])] for j in V if j != i and t-1-tau[j-1][i-1] >= 0 and (t-1-tau[j-1][i-1], j, i, k+kappa[j-1][i-1]) in uij]) - lpSum([uij[(t-1, i, j, k)] for j in V if j != i and (t-1, i, j, k) in uij])
-            else:
+                    m.addConstr(ni[t, i, k] == quicksum(uij[t-1-tau[j-1][i-1], j, i, k+kappa[j-1][i-1]] for j in V if j != i and t-1-tau[j-1][i-1] >= 0 and (t-1-tau[j-1][i-1], j, i, k+kappa[j-1][i-1]) in uij) - quicksum(uij[t-1, i, j, k] for j in V if j != i and (t-1, i, j, k) in uij))
+
+# The rest of your constraints
+for i in V:
+    for k in range(K+1):
+        if i != 3:
+            for t in range(T+1):
                 if k != 0:
                     if t > gamma[k-1]:
-                        prob += ni[(t, i, k)] == ni[(t-1, i, k)] + lpSum([uij[(t-1-tau[j-1][i-1], j, i, k+kappa[j-1][i-1])] for j in V if j != i and t-1-tau[j-1][i-1] >= 0 and (t-1-tau[j-1][i-1], j, i, k+kappa[j-1][i-1]) in uij]) - lpSum([uij[(t-1, i, j, k)] for j in V if j != i and (t-1, i, j, k) in uij]) + ni[(t-gamma[k-1], i, k-1)] - ni[(t-gamma[k-1], i, k)]
+                        m.addConstr(ni[t, i, k] == ni[t-1, i, k] + quicksum(uij[t-1-tau[j-1][i-1], j, i, k+kappa[j-1][i-1]] for j in V if j != i and t-1-tau[j-1][i-1] >= 0 and (t-1-tau[j-1][i-1], j, i, k+kappa[j-1][i-1]) in uij) - quicksum(uij[t-1, i, j, k] for j in V if j != i and (t-1, i, j, k) in uij) + ni[int(t-gamma[k-1]), i, k-1] - ni[int(t-gamma[k-1]), i, k])
 
 for j in [0, 1]:
     for i in [0, 1]:
         if i != j:
             for t in range(T):
-                prob += lpSum([uij[(t, i, j, k)] for k in range(K+1)]) >= f_values[t][i][j]
+                m.addConstr(uij.sum(t, i, j, '*') >= f_values[t][i][j])
 
 for i in V:
     for k in range(K+1):
         for t in range(T+1):
             if t > 0:
-                prob += ni[(t-1, i, k)] >= lpSum([uij[(t-1, i, j, k)] for j in V if j != i])
+                m.addConstr(ni[t-1, i, k] >= uij.sum(t-1, i, '*', k))
 
 for i in V:
     for k in range(K+1):
-        prob += ni[(0, i, k)] == ni[(T, i, k)]
+        m.addConstr(ni[0, i, k] == ni[T, i, k])
 
-# Non-negativity constraints
-for i in V:
-    for j in V:
-        if i != j:
-            for k in range(K+1):
-                for t in range(T+1):
-                    prob += uij[(t, i, j, k)] >= 0
+# Integrate new variables
+m.update()
 
-for i in V:
-    for k in range(K+1):
-        for t in range(T+1):
-            prob += ni[(t, i, k)] >= 0
+# Solve model
+m.optimize()
 
-# Objective function
-prob += lpSum([ni[(0, i, k)] for i in V for k in range(K+1)])
+if m.status == GRB.Status.INFEASIBLE:
+    print('The model is infeasible; computing IIS')
+    m.computeIIS()
+    m.write("model.ilp")
+    m.feasRelaxS(0, False, False, True) # calculate relaxed solution
+    m.optimize()
 
-# The problem is solved using PuLP's choice of Solver
-prob.solve()
 
-# Each of the variables is printed with it's resolved optimum value
-for v in prob.variables():
-    print(v.name, "=", v.varValue)
 
-# The optimized objective function value is printed to the console
-print("Total Fleet Size = ", value(prob.objective))
+# Print results
+for v in m.getVars():
+    if v.x > 0:  # Print only non-zero variables for clarity
+        print('{} = {}'.format(v.varName, v.x))
 
+print('Total Fleet Size:', m.objVal)
