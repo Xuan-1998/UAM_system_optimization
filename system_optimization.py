@@ -43,7 +43,7 @@ for t in range(T + 1):
 
 # initial
 f_values = np.zeros((T, 2, 2))
-data = pd.read_csv('schedule.csv')
+data = pd.read_csv('input/schedule.csv')
 LAX_DTLA = data[data['od'] == 'LAX_DTLA']
 DTLA_LAX = data[data['od'] == 'DTLA_LAX']
 # Create the list of lists
