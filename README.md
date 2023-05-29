@@ -12,7 +12,9 @@ For solving the optimization problem as follows:
 
 The dynamic equation is then:
 
-$n_{i}^{k}(t) = n_{i}^{k}(t-1) + \sum _{j \in V-\{i\}} u_{j,i}^{k+\kappa_{j,i}}(t-\tau_{j,i}) - \sum_{j \in V-\{i\}} u_{i,j}^{k} (t) + \sum_{x=0}^{k-1} C_{i}^{x,k} (t-\sum_{i=x+1}^{k} \gamma_{i}) - \sum_{y=k+1}^{|\gamma|} C_{i}^{k,y}(t)$
+```math
+n_{i}^{k}(t) = n_{i}^{k}(t-1) + \sum _{j \in V-\{i\}} u_{j,i}^{k+\kappa_{j,i}}(t-\tau_{j,i}) - \sum_{j \in V-\{i\}} u_{i,j}^{k} (t) + \sum_{x=0}^{k-1} C_{i}^{x,k} (t-\sum_{i=x+1}^{k} \gamma_{i}) - \sum_{y=k+1}^{|\gamma|} C_{i}^{k,y}(t)
+```
 
 Therefore, an aircraft can be in one of the three states at any given point in time: (1) idle (2) charging (3) flight
 
