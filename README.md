@@ -37,6 +37,7 @@ $u_{12}^0(t) = u_{21}^0(t) = 0 \textit{  Can't fly when SOC = 0}$
     $$C_i^{x,y} = 0, \quad \forall x<y, \quad x,y \in \gamma$$
 
 
+
 We keep all the constraints we discussed previously and the optimization problem becomes:
 
 $min \sum_{i}\sum_{k} n_{i}^{k}(t=0) + \sum_{i} \sum_{j} \sum_{k} u_{i,j}^k(t = 0) + \sum_i \sum_{x} \sum_{y} C_i^{xy}(t = 0)$
