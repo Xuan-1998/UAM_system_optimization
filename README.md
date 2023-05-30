@@ -34,7 +34,7 @@ $u_{12}^0(t) = u_{21}^0(t) = 0 \textit{  Can't fly when SOC = 0}$
 
 - No Charging happening:
 
-    $$C_i^{x,y} = 0, \quad \forall x<y, \quad x,y \in \gamma$$
+    $$C_i^{x,y} = 0, \quad \forall x \lt y, \quad x,y \in \gamma$$
 
 
 
