@@ -22,6 +22,14 @@ $\sum_{k \in\{1, \cdots, K\}} u_{12}^k(t) \geq f_{12}(t), \sum_{k \in\{1, \cdots
 
 $u_{12}^0(t) = u_{21}^0(t) = 0 \textit{  Can't fly when SOC = 0}$
 
+Initial Condition (all aircraft with full SOC):
+
+$$u_{i,j}^{k}(0) = 0 (k = 0,1...,K-1) \textit{ Only fly full charged aircraft}$$ 
+
+$$n_i^k(0) = 0(k = 0,1,...,K-1) \textit{ Only idle full charged aircraft}$$
+
+$$C_i^{x,y} = 0 (x<y \textit{ and } x,y \in \gamma) \textit{ No Charging happening}$$
+
 We keep all the constraints we discussed previously and the optimization problem becomes:
 
 $min \sum_{i}\sum_{k} n_{i}^{k}(t=0) + \sum_{i} \sum_{j} \sum_{k} u_{i,j}^k(t = 0) + \sum_i \sum_{x} \sum_{y} C_i^{xy}(t = 0)$
