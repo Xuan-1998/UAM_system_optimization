@@ -1,0 +1,57 @@
+
+
+12 miles:
+Flight time statistics in minutes:
+-----------------------------
+           mean  median  std   max   min
+LAX_LAX12  5.92    5.92  0.0  5.92  5.92
+LAX12_LAX  5.85    5.85  0.0  5.85  5.85
+
+ 
+Energy consumption statistics in kWh:
+-----------------------------
+            mean  median  std    max    min
+LAX_LAX12  12.35   12.35  0.0  12.35  12.35
+LAX12_LAX  11.91   11.91  0.0  11.91  11.91
+
+24 miles:
+Flight time statistics in minutes:
+-----------------------------
+            mean  median  std    max    min
+LAX_LAX24   9.82    9.82  0.0   9.82   9.82
+LAX24_LAX  10.59   10.59  0.0  10.59  10.59
+
+ 
+Energy consumption statistics in kWh:
+-----------------------------
+            mean  median  std    max    min
+LAX_LAX24  16.04   16.04  0.0  16.04  16.04
+LAX24_LAX  17.11   17.11  0.0  17.11  17.11
+
+48 miles:
+Flight time statistics in minutes:
+-----------------------------
+            mean  median  std    max    min
+LAX_LAX48  19.35   19.35  0.0  19.35  19.35
+LAX48_LAX  19.39   19.39  0.0  19.39  19.39
+
+ 
+Energy consumption statistics in kWh:
+-----------------------------
+            mean  median  std    max    min
+LAX_LAX48  26.52   26.52  0.0  26.52  26.52
+LAX48_LAX  26.71   26.71  0.0  26.71  26.71
+
+72 miles:
+Flight time statistics in minutes:
+-----------------------------
+            mean  median  std    max    min
+LAX_LAX72  28.19   28.19  0.0  28.19  28.19
+LAX72_LAX  28.20   28.20  0.0  28.20  28.20
+
+ 
+Energy consumption statistics in kWh:
+-----------------------------
+            mean  median  std    max    min
+LAX_LAX72  36.31   36.31  0.0  36.31  36.31
+LAX72_LAX  36.40   36.40  0.0  36.40  36.40
