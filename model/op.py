@@ -75,7 +75,10 @@ def number_aircrafts_lp(tau, kappa, gamma, schedule, schedule_time_step, output_
     uij = m.addVars(((t, i, j, k) for t in range(T) for i in V for j in V for k in range(K+1) if i != j), vtype=GRB.INTEGER, name="u")
     cijk = m.addVars(((t, i, x, y) for t in range(T) for i in V for x in range(K+1) for y in range(K+1) if x < y), vtype=GRB.INTEGER, name="c")
 
-    m.setObjective(ni.sum(0, '*', '*') + uij.sum(0, '*', '*', '*') + cijk.sum(0, '*', '*', '*')+ cost_ratio_flight2plane*uij.sum('*', '*', '*', '*'), GRB.MINIMIZE)
+    m.setObjective(ni.sum(0, '*', '*') + 
+                   uij.sum(0, '*', '*', '*') + 
+                   cijk.sum(0, '*', '*', '*') + 
+                   cost_ratio_flight2plane*(uij.sum('*', '*', '*', '*')-LAX_DTLA.sum()-DTLA_LAX.sum()), GRB.MINIMIZE)
 
     # Dynamic equation
     for i in V:
