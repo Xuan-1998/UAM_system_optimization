@@ -130,7 +130,7 @@ def number_aircrafts_lp(tau, kappa, gamma, schedule, schedule_time_step, output_
         if v.x > 0:  # Print only non-zero variables for clarity
             print('{} = {}'.format(v.varName, v.x))
 
-    print('Total Fleet Size:', m.objVal)
+    print('Total Fleet Size:', (ni.sum(0, '*', '*') + uij.sum(0, '*', '*', '*') + cijk.sum(0, '*', '*', '*')).getValue())
 
     # Open a file for writing
     with open(f'../output/{output_path}.txt', 'w') as file:
