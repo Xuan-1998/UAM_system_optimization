@@ -10,7 +10,7 @@ def number_aircrafts_lp(tau, kappa, gamma, schedule, schedule_time_step, output_
     tau = np.ceil(tau)
 
     # SOC levels drop matrix
-    kappa = np.array(kappa) / 10
+    kappa = np.array(kappa) / 5
     kappa = np.ceil(kappa)
 
     # Charging Time matrix
@@ -22,28 +22,23 @@ def number_aircrafts_lp(tau, kappa, gamma, schedule, schedule_time_step, output_
     T = schedule_time_step + 1 + max_flight_time
 
     # Constants
-    K = 8
+    K = len(gamma)
     V = [0, 1]
 
     f_values = np.zeros((T, 2, 2))
     data = pd.read_csv(f'../input/{schedule}.csv')
-    LAX_DTLA = data[data['od'] == 'LAX_DTLA']
-    DTLA_LAX = data[data['od'] == 'DTLA_LAX']
+    # Create 5 minute bins (24 hours * 60 minutes / 5 minute intervals)
+    bins = np.arange(0, 24*60+1, 5)
 
-    # Create the list of lists
-    LAX_DTLA = [[1 if i in LAX_DTLA['schedule'].tolist() else 0] for i in range(1440)]
-    DTLA_LAX = [[1 if i in DTLA_LAX['schedule'].tolist() else 0] for i in range(1440)]
+    # Bin the schedule data
+    data['time_bins'] = pd.cut(data['schedule'], bins, right=False)
 
-    # Reshape the array
-    new_array_LAX_DTLA = np.array(LAX_DTLA).reshape((288, 5)).tolist()
-    new_array_DTLA_LAX = np.array(DTLA_LAX).reshape((288, 5)).tolist()
+    # Group by od and time_bins, count the number of occurrences, unstack 'od' and fill NaNs with 0
+    counts = data.groupby(['od', 'time_bins']).size().unstack('od', fill_value=0)
 
-    # Add elements within each cell
-    new_array_LAX_DTLA_sum = np.sum(new_array_LAX_DTLA, axis=1)
-    new_array_DTLA_LAX_sum = np.sum(new_array_DTLA_LAX, axis=1)
-
-    LAX_DTLA = new_array_LAX_DTLA_sum # Binary flight schedule for 5-mins intervals
-    DTLA_LAX = new_array_DTLA_LAX_sum
+    # Get the two 288 element lists
+    LAX_DTLA = np.array(counts['LAX_DTLA'].tolist())
+    DTLA_LAX = np.array(counts['DTLA_LAX'].tolist())
 
     for t in range(T-max_flight_time-1):
         f_values[t+1][0][1] = LAX_DTLA[t] # get the first (and only) item of the inner list

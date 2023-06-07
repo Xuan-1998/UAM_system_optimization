@@ -22,19 +22,13 @@ $\sum_{k \in\{1, \cdots, K\}} u_{12}^k(t) \geq f_{12}(t), \sum_{k \in\{1, \cdots
 
 $u_{12}^0(t) = u_{21}^0(t) = 0 \textit{  Can't fly when SOC = 0}$
 
-### Initial Condition (all aircraft with full SOC):
+### Stationarity
 
-- Only fly full charged aircraft: 
+- $n_{i}^{k}(0)=n_{i}^{k}(T)$
 
-    $$u_{i,j}^{k}(0) = 0, \quad \forall k \in \{0,1,\ldots,K-1\}$$ 
+- $u_{i,j}^{k}(0)=u_{i,j}^{k}(T)$
 
-- Only idle full charged aircraft:
-
-    $$n_i^k(0) = 0, \quad \forall k \in \{0,1,\ldots,K-1\}$$
-
-- No Charging happening:
-
-    $$C_i^{x,y} = 0, \quad \forall x \lt y, \quad x,y \in \gamma$$
+- $C_{i}^{xy}(0)=C_{i}^{xy}(T)$
 
 
 ### Starting and Ending States for stationarity constraints
