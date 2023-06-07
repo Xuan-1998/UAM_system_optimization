@@ -10,7 +10,7 @@ def number_aircrafts_lp(tau, kappa, gamma, schedule, schedule_time_step, output_
     tau = np.ceil(tau)
 
     # SOC levels drop matrix
-    kappa = np.array(kappa) / 10
+    kappa = np.array(kappa) / 5
     kappa = np.ceil(kappa)
 
     # Charging Time matrix
@@ -22,7 +22,7 @@ def number_aircrafts_lp(tau, kappa, gamma, schedule, schedule_time_step, output_
     T = schedule_time_step + 1 + max_flight_time
 
     # Constants
-    K = 8
+    K = len(gamma)
     V = [0, 1]
 
     f_values = np.zeros((T, 2, 2))
