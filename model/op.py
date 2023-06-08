@@ -4,18 +4,26 @@ import numpy as np
 
 
 
-def number_aircrafts_lp(tau, kappa, gamma, schedule, schedule_time_step, output_path, cost_ratio_flight2plane = 0):
+def number_aircrafts_lp(schedule, 
+                        schedule_time_step,
+                        output_path,
+                        tau=[[0, 5.92], [5.85, 0]], 
+                        kappa = [[0, 7.71875], [7.44375, 0]], 
+                        gamma = [1.567183013,1.670689686,1.79349788,1.935972287,2.103057098,
+                                 2.30172949,2.541890384,2.83806663,3.212473781,3.70088931,
+                                 4.364896382,5.32037536,6.814736187,9.490547548,15.74119426,55.66984127], 
+                        fixed_cost=1, 
+                        variable_cost=0):
     # Flight time matrix
     tau = np.array(tau) / 5
     tau = np.ceil(tau)
 
     # SOC levels drop matrix
-    kappa = np.array(kappa) / 10
+    kappa = np.array(kappa) / (80/len(gamma))
     kappa = np.ceil(kappa)
 
     # Charging Time matrix
-    gamma = np.array(gamma) / 5
-    gamma = np.ceil(gamma)
+    gamma = np.array(gamma) 
 
     max_flight_time = int(np.max(tau))
 
@@ -44,24 +52,6 @@ def number_aircrafts_lp(tau, kappa, gamma, schedule, schedule_time_step, output_
         f_values[t+1][0][1] = LAX_DTLA[t] # get the first (and only) item of the inner list
         f_values[t+1][1][0] = DTLA_LAX[t] # get the first (and only) item of the inner list
 
-    variables = {f'a{str(i)}': [] for i in range(2, int(sum(gamma)) + 1)}
-
-    def find_combinations(k):
-        a = []
-        for i in range(len(gamma)):
-            for j in range(len(gamma)):
-                if i != j:
-                    if sum(gamma[i:j+1]) == k:
-                        a.append([i,j])
-                if gamma[i] == k:
-                    a.append([i])
-        a_unique = list(set(tuple(i) for i in a))
-        a_unique = [item[0] if len(item) == 1 else item for item in a_unique]
-        return a_unique
-
-    for i in range(2, int(sum(gamma)) + 1):
-        variables['a' + str(i)] = find_combinations(i)
-
     # Create a new model
     m = Model("Vertiport_Aircraft_Routing")
 
@@ -70,10 +60,10 @@ def number_aircrafts_lp(tau, kappa, gamma, schedule, schedule_time_step, output_
     uij = m.addVars(((t, i, j, k) for t in range(T) for i in V for j in V for k in range(K+1) if i != j), vtype=GRB.INTEGER, name="u")
     cijk = m.addVars(((t, i, x, y) for t in range(T) for i in V for x in range(K+1) for y in range(K+1) if x < y), vtype=GRB.INTEGER, name="c")
 
-    m.setObjective(ni.sum(0, '*', '*') + 
+    m.setObjective(fixed_cost*(ni.sum(0, '*', '*') + 
                    uij.sum(0, '*', '*', '*') + 
-                   cijk.sum(0, '*', '*', '*') + 
-                   cost_ratio_flight2plane*(uij.sum('*', '*', '*', '*')-LAX_DTLA.sum()-DTLA_LAX.sum()), GRB.MINIMIZE)
+                   cijk.sum(0, '*', '*', '*')) + 
+                   variable_cost*(uij.sum('*', '*', '*', '*')-LAX_DTLA.sum()-DTLA_LAX.sum()), GRB.MINIMIZE)
 
     # Dynamic equation
     for i in V:
@@ -83,7 +73,7 @@ def number_aircrafts_lp(tau, kappa, gamma, schedule, schedule_time_step, output_
                     ni[t, i, k] == ni[t-1, i, k] + 
                     quicksum(uij[t-tau[j][i], j, i, k+kappa[j][i]] for j in V if j != i and t-1-tau[j][i] >= 0 and k+kappa[j][i] <= K) -
                     quicksum(uij[t, i, j, k] for j in V if j != i) +
-                    quicksum(cijk[t-sum(gamma[x:k]), i, x, k] for x in range(k) if t-sum(gamma[x:k]) >= 0) -
+                    quicksum(cijk[t-np.ceil(sum(gamma[x:k])/5), i, x, k] for x in range(k) if t-np.ceil(sum(gamma[x:k])/5) >= 0) -
                     quicksum(cijk[t, i, k, y] for y in range(k+1, K+1))
                 )
 
