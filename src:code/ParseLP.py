@@ -48,7 +48,7 @@ def convert2df(output_file):
 
 
 def calculate_num_aircrafts(specificc, specificu, specificn, gamma, flight_time=np.array([[0,2],[2,0]])):
-    end = specificn['t'].max() + 1
+    end = 288 + 1 + int(np.max(flight_time))
     all_c = np.zeros(shape=(1,end), dtype=int)
     for i in range(specificc.shape[0]):
         val = int(specificc['amount'][i])
