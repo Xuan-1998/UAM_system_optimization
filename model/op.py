@@ -63,7 +63,7 @@ def number_aircrafts_lp(schedule,
     m.setObjective(fixed_cost*(ni.sum(0, '*', '*') + 
                    uij.sum(0, '*', '*', '*') + 
                    cijk.sum(0, '*', '*', '*')) + 
-                   variable_cost*(uij.sum('*', '*', '*', '*')-LAX_DTLA.sum()-DTLA_LAX.sum()), GRB.MINIMIZE)
+                   variable_cost*(uij.sum('*', '*', '*', '*')), GRB.MINIMIZE)
 
     # Dynamic equation
     for i in V:

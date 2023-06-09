@@ -47,7 +47,13 @@ def convert2df(output_file):
     return specificn, specificu, specificc
 
 
-def calculate_num_aircrafts(specificc, specificu, specificn, gamma, flight_time=np.array([[0,2],[2,0]])):
+def calculate_num_aircrafts(specificc, 
+                            specificu, 
+                            specificn, 
+                            gamma = np.array([1.567183013,1.670689686,1.79349788,1.935972287,2.103057098,
+                                     2.30172949,2.541890384,2.83806663,3.212473781,3.70088931,
+                                     4.364896382,5.32037536,6.814736187,9.490547548,15.74119426,55.66984127]), 
+                            flight_time=np.array([[0,2],[2,0]])):
     end = 288 + 1 + int(np.max(flight_time))
     all_c = np.zeros(shape=(1,end), dtype=int)
     for i in range(specificc.shape[0]):
@@ -55,7 +61,7 @@ def calculate_num_aircrafts(specificc, specificu, specificn, gamma, flight_time=
         soc0 = int(specificc['x'][i])
         soc1 = int(specificc['y'][i])
         t = int(specificc['t'][i])
-        time_charge = int(gamma[soc0: soc1].sum())
+        time_charge = int(np.ceil(gamma[soc0: soc1].sum()/5))
         occupied = np.zeros(shape=(val,end))
         for j in range(val):
             occupied[j][t:t+time_charge] = 1
