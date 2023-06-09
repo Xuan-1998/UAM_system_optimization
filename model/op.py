@@ -13,7 +13,7 @@ def number_aircrafts_lp(schedule,
                                  2.30172949,2.541890384,2.83806663,3.212473781,3.70088931,
                                  4.364896382,5.32037536,6.814736187,9.490547548,15.74119426,55.66984127], 
                         fixed_cost=1, 
-                        variable_cost=0):
+                        variable_cost=0.01):
     # Flight time matrix
     tau = np.array(tau) / 5
     tau = np.ceil(tau)
