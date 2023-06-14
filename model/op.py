@@ -249,6 +249,12 @@ def number_aircrafts_lp_DTLA_charging(schedule,
     m.Params.FeasibilityTol = 1e-7
     # Solve model
     m.optimize()
+    if m.status == GRB.Status.INFEASIBLE:
+        print('The model is infeasible; computing IIS')
+        m.computeIIS()
+        m.write("model.ilp")
+        m.feasRelaxS(0, False, False, True) # calculate relaxed solution
+        m.optimize()
 
     # Print results
     for v in m.getVars():
