@@ -99,7 +99,7 @@ def calculate_num_aircrafts(specificc,
 
     return all_c, all_n, all_u
 
-def plot_charging_policy(specificc, gamma = np.array([0.0129,0.0133,0.0137,0.0142,0.0147,
+def plot_charging_policy(specificc, name, gamma = np.array([0.0129,0.0133,0.0137,0.0142,0.0147,
                                           0.0153,0.0158,0.0166,0.0172,0.018,
                                           0.0188,0.0197,0.0207,0.0219,0.0231,
                                           0.0245,0.026,0.0278,0.03,0.0323,
@@ -146,11 +146,44 @@ def plot_charging_policy(specificc, gamma = np.array([0.0129,0.0133,0.0137,0.014
     cbar = plt.colorbar(heatmap)
 
     # Set the title and labels
-    ax.set_title('Heatmap of Time Steps and SOC Levels')
+    ax.set_title('Heatmap of Time Steps and SOC Levels for Charging Policy ' + name)
     ax.set_xlabel('Time Step')
     ax.set_ylabel('SOC Level')
 
     # Display the plot
     plt.show()
 
+def plot_SOC_demand_time(specificn, demand, name):
+    specificn['k'] = specificn['k'] * specificn['amount']
+    specificn = specificn.groupby('t').sum().reset_index()
+    fig, ax1 = plt.subplots()
+
+    # Plotting Total SOC of the system
+    ax1.plot(specificn['t'], specificn['k'], label='Total SOC of the system', color='blue')
+    ax1.set_xlabel('Time')
+    ax1.set_ylabel('Total SOC')
+    ax1.tick_params(axis='y')
+
+    # Creating a twin Axes object
+    ax2 = ax1.twinx()
+
+    # Plotting Number of Passengers
+    ax2.plot(demand['passenger_arrival_time'], demand['passenger_id'], label='Number of Passengers', color='red')
+    ax2.set_ylabel('Number of Passengers')
+    ax2.tick_params(axis='y')
+
+    # Combining the legends from both axes
+    lines_1, labels_1 = ax1.get_legend_handles_labels()
+    lines_2, labels_2 = ax2.get_legend_handles_labels()
+
+    # Assigning colors to the legends
+    legend1 = ax1.legend(lines_1, labels_1, loc='upper left', frameon=False)
+    for text in legend1.get_texts():
+        text.set_color('blue')
+
+    legend2 = ax2.legend(lines_2, labels_2, loc='upper right', frameon=False)
+    for text in legend2.get_texts():
+        text.set_color('red')
+    plt.title('System’s SOCs vs Demand over time for Charging Policy ' + name)
+    plt.show()
 
