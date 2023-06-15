@@ -385,17 +385,13 @@ def number_aircrafts_lp_middle_charging(schedule,
                 if i != j:
                     m.addConstr(uij[t, i, j, 0] == 0)
                     
-    for x in range(K+1):
-        for y in range(K+1):
-            for i in V:
-                if t in range(T):
-                    if (x < y):
-                        m.addConstr(cijk[t, i, x, y] == 0)
+    m.addConstr(cijk.sum('*', 1, '*', '*') == 0)
+    m.addConstr(cijk.sum('*', 0, '*', '*') == 0)
 
     # Integrate new variables
     m.update()
 
-    m.Params.MIPGap = 0.08  # Set the optimality tolerance to 5%
+    m.Params.MIPGap = 0.13  # Set the optimality tolerance to 5%
     m.Params.FeasibilityTol = 1e-7
     # Solve model
     m.optimize()
