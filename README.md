@@ -20,13 +20,13 @@ Therefore, an aircraft can be in one of the three states at any given point in t
 
 $\sum_{k \in\{1, \cdots, K\}} u_{12}^k(t) \geq f_{12}(t), \sum_{k \in\{1, \cdots, K\}} u_{21}^k(t) \geq f_{21}(t)$ The flight schedule must be satisfied
 
-$u_{12}^0(t) = u_{21}^0(t) = 0 \textit{  Cannot fly when SOC = 0}$ 0 is the reserved SOC
+$u_{12}^0(t) = u_{21}^0(t) = 0$ Cannot fly when SOC = 0. 0 is the reserved SOC
 
 ## Stationarity Condition
 T = number of timesteps + 1 + max flight time
 
-$n_{i}^{k}(0)=n_{i}^{k}(T)$, $u_{i,j}^{k}(0)=u_{i,j}^{k}(T)$, $C_{i}^{xy}(0)=C_{i}^{xy}(T)$
+$n_{i}^{k}(0)=n_{i}^{k}(T)$, $u_{ij}^{k}(0)=u_{ij}^{k}(T)$, $C_{i}^{xy}(0)=C_{i}^{xy}(T)$
 
 ## Objective Function
 
-$min \sum_{i}\sum_{k} n_{i}^{k}(t=0) + \sum_{i} \sum_{x} \sum_{y} C_i^{xy}(t = 0) + 0.00001 \cdot  \sum_{t} \sum_{i} \sum_{x} \sum_{y} u_{i,j}^{k}(t)$
+$min \sum_{i}\sum_{k} n_{i}^{k}(t=0) + \sum_{i} \sum_{x} \sum_{y} C_i^{xy}(t = 0) + 0.00001 \cdot  \sum_{t} \sum_{i} \sum_{j} \sum_{k} u_{i,j}^{k}(t)$
