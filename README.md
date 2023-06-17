@@ -5,8 +5,8 @@ For solving the optimization problem as follows:
 - $n_{i}^{k}(t)$ = \# of idle aircraft at vertiport i of SOC k at time t
 - $u_{i,j}^{k}(t)$ = \# of flights departing for vertiport j from vertiport i at time t
 - $C_{i}^{xy}(t)$ = \# of aircraft at vertiport i that begin to charge at t with an initial SOC of x and a target SOC of y
-- $\gamma_{i}$ is the charging time needed to transition from $SOC_{k-1}$ to $SOC_{k}$
-- $|\gamma|$ is the \# of SOCs 
+- $\gamma_{k}$ is the charging time needed to transition from $SOC_{k-1}$ to $SOC_{k}$
+- $\Gamma$ is the \# of SOCs. $\Gamma = 32$
 - $\tau_{ij}$ is the flight time from vertiport i to j
 - $\kappa_{ij}$ is the \# of SOCs dropped in flight from vertiport i to j
 
@@ -20,9 +20,7 @@ Therefore, an aircraft can be in one of the three states at any given point in t
 
 $\sum_{k \in\{1, \cdots, K\}} u_{12}^k(t) \geq f_{12}(t), \sum_{k \in\{1, \cdots, K\}} u_{21}^k(t) \geq f_{21}(t),: \textit{ The flight schedule must be satisfied. }$
 
-$u_{12}^0(t) = u_{21}^0(t) = 0 \textit{  Cannot fly when SOC = 0}$
-
-0 is the reserved SOC
+$u_{12}^0(t) = u_{21}^0(t) = 0 \textit{  Cannot fly when SOC = 0}$ 0 is the reserved SOC
 
 ## Stationarity Condition
 T = number of timesteps + 1 + max flight time
