@@ -7,8 +7,8 @@ import numpy as np
 def number_aircrafts_lp(schedule, 
                         schedule_time_step,
                         output_path,
-                        tau=[[0, 5.92], [5.85, 0]], 
-                        kappa = [[0, 7.71875], [7.44375, 0]], 
+                        tau=[[0, 10], [10, 0]], 
+                        kappa = [[0, 10], [10, 0]], 
                         gamma = np.array([0.0129,0.0133,0.0137,0.0142,0.0147,
                                           0.0153,0.0158,0.0166,0.0172,0.018,
                                           0.0188,0.0197,0.0207,0.0219,0.0231,
@@ -17,7 +17,7 @@ def number_aircrafts_lp(schedule,
                                           0.0617,0.0726,0.0887,0.1136,0.1582,
                                           0.2622,0.9278,])*60, 
                         fixed_cost=1, 
-                        variable_cost=0.01):
+                        variable_cost=0.00001):
     
     # Flight time matrix
     tau = np.array(tau) / 5
@@ -248,13 +248,13 @@ def number_aircrafts_lp_DTLA_charging(schedule,
     m.Params.MIPGap = 0.05  # Set the optimality tolerance to 5%
     m.Params.FeasibilityTol = 1e-7
     # Solve model
-    m.optimize()
-    if m.status == GRB.Status.INFEASIBLE:
-        print('The model is infeasible; computing IIS')
-        m.computeIIS()
-        m.write("model.ilp")
-        m.feasRelaxS(0, False, False, True) # calculate relaxed solution
-        m.optimize()
+    # m.optimize()
+    # if m.status == GRB.Status.INFEASIBLE:
+    #     print('The model is infeasible; computing IIS')
+    #     m.computeIIS()
+    #     m.write("model.ilp")
+    #     m.feasRelaxS(0, False, False, True) # calculate relaxed solution
+    #     m.optimize()
 
     # Print results
     for v in m.getVars():
@@ -395,12 +395,12 @@ def number_aircrafts_lp_middle_charging(schedule,
     m.Params.FeasibilityTol = 1e-7
     # Solve model
     m.optimize()
-    if m.status == GRB.Status.INFEASIBLE:
-        print('The model is infeasible; computing IIS')
-    m.computeIIS()
-    m.write("model.ilp")
-    m.feasRelaxS(0, False, False, True) # calculate relaxed solution
-    m.optimize()
+    # if m.status == GRB.Status.INFEASIBLE:
+    #     print('The model is infeasible; computing IIS')
+    # m.computeIIS()
+    # m.write("model.ilp")
+    # m.feasRelaxS(0, False, False, True) # calculate relaxed solution
+    # m.optimize()
 
     # Print results
     for v in m.getVars():

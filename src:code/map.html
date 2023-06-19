@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_e4a1680353075e813c51b818481a61f2 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_e4a1680353075e813c51b818481a61f2" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_e4a1680353075e813c51b818481a61f2 = L.map(
+                "map_e4a1680353075e813c51b818481a61f2",
+                {
+                    center: [34.0522, -118.2437],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 11,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_7571e0bb6b9c0c3b7844db338b8f5db9 = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca target=\"_blank\" href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_e4a1680353075e813c51b818481a61f2);
+        
+    
+            var marker_40ae78481876b23d245af9bfa71f8996 = L.marker(
+                [34.18084, -118.308968],
+                {}
+            ).addTo(map_e4a1680353075e813c51b818481a61f2);
+        
+    
+        var popup_ac3eb3636fb678437133f056c38aed95 = L.popup({"autoClose": false, "maxWidth": "100%"});
+
+        
+            
+                var html_b70d8b6f179f4cbc66ddfd4232970d4a = $(`<div id="html_b70d8b6f179f4cbc66ddfd4232970d4a" style="width: 100.0%; height: 100.0%;"><div style='font-size: 10pt'>Burbank, CA</div></div>`)[0];
+                popup_ac3eb3636fb678437133f056c38aed95.setContent(html_b70d8b6f179f4cbc66ddfd4232970d4a);
+            
+        
+
+        marker_40ae78481876b23d245af9bfa71f8996.bindPopup(popup_ac3eb3636fb678437133f056c38aed95)
+        .openPopup();
+
+        
+    
+    
+            var marker_1d37a935c40760381046c1deb84f909e = L.marker(
+                [34.189857, -118.451355],
+                {}
+            ).addTo(map_e4a1680353075e813c51b818481a61f2);
+        
+    
+        var popup_f8c9a9d3492c73e47f01cc9185a9404b = L.popup({"autoClose": false, "maxWidth": "100%"});
+
+        
+            
+                var html_ee42eb1f12f94269f71f70ede35b1b10 = $(`<div id="html_ee42eb1f12f94269f71f70ede35b1b10" style="width: 100.0%; height: 100.0%;"><div style='font-size: 10pt'>Van Nuys, CA</div></div>`)[0];
+                popup_f8c9a9d3492c73e47f01cc9185a9404b.setContent(html_ee42eb1f12f94269f71f70ede35b1b10);
+            
+        
+
+        marker_1d37a935c40760381046c1deb84f909e.bindPopup(popup_f8c9a9d3492c73e47f01cc9185a9404b)
+        .openPopup();
+
+        
+    
+    
+            var marker_49dd76c84c76cc1546a0d5d4eedf5780 = L.marker(
+                [33.919434, -118.353996],
+                {}
+            ).addTo(map_e4a1680353075e813c51b818481a61f2);
+        
+    
+        var popup_3b5288391e71540ca123ba793ff133f6 = L.popup({"autoClose": false, "maxWidth": "100%"});
+
+        
+            
+                var html_b2d91eb800adf8fedc4e4328785562af = $(`<div id="html_b2d91eb800adf8fedc4e4328785562af" style="width: 100.0%; height: 100.0%;"><div style='font-size: 10pt'>Hawthorne, CA</div></div>`)[0];
+                popup_3b5288391e71540ca123ba793ff133f6.setContent(html_b2d91eb800adf8fedc4e4328785562af);
+            
+        
+
+        marker_49dd76c84c76cc1546a0d5d4eedf5780.bindPopup(popup_3b5288391e71540ca123ba793ff133f6)
+        .openPopup();
+
+        
+    
+    
+            var marker_1bcb1fe92e34ff6feea9295e85b12db3 = L.marker(
+                [34.021984, -118.284927],
+                {}
+            ).addTo(map_e4a1680353075e813c51b818481a61f2);
+        
+    
+        var popup_d034644c09626c269eafdd7bb38701a8 = L.popup({"autoClose": false, "maxWidth": "100%"});
+
+        
+            
+                var html_759d45908e87c107703612e9b875dd1c = $(`<div id="html_759d45908e87c107703612e9b875dd1c" style="width: 100.0%; height: 100.0%;"><div style='font-size: 10pt'>University of Southern California</div></div>`)[0];
+                popup_d034644c09626c269eafdd7bb38701a8.setContent(html_759d45908e87c107703612e9b875dd1c);
+            
+        
+
+        marker_1bcb1fe92e34ff6feea9295e85b12db3.bindPopup(popup_d034644c09626c269eafdd7bb38701a8)
+        .openPopup();
+
+        
+    
+    
+            var marker_ccec86cf0b03e26c739a09f1213b895f = L.marker(
+                [34.01009, -118.496948],
+                {}
+            ).addTo(map_e4a1680353075e813c51b818481a61f2);
+        
+    
+        var popup_ab893a960cd17222975d1b4c5f080162 = L.popup({"autoClose": false, "maxWidth": "100%"});
+
+        
+            
+                var html_d718694be62a2796ad3ccd58b78445cc = $(`<div id="html_d718694be62a2796ad3ccd58b78445cc" style="width: 100.0%; height: 100.0%;"><div style='font-size: 10pt'>Santa Monica Pier</div></div>`)[0];
+                popup_ab893a960cd17222975d1b4c5f080162.setContent(html_d718694be62a2796ad3ccd58b78445cc);
+            
+        
+
+        marker_ccec86cf0b03e26c739a09f1213b895f.bindPopup(popup_ab893a960cd17222975d1b4c5f080162)
+        .openPopup();
+
+        
+    
+    
+            var marker_62c82630461120549965347eb053bf67 = L.marker(
+                [34.14695, -118.14906],
+                {}
+            ).addTo(map_e4a1680353075e813c51b818481a61f2);
+        
+    
+        var popup_7e4363a769f1378a7ddd62bdb23341d8 = L.popup({"autoClose": false, "maxWidth": "100%"});
+
+        
+            
+                var html_668552315f1e6f75674defaa3e9d728e = $(`<div id="html_668552315f1e6f75674defaa3e9d728e" style="width: 100.0%; height: 100.0%;"><div style='font-size: 10pt'>Old Town Pasadena</div></div>`)[0];
+                popup_7e4363a769f1378a7ddd62bdb23341d8.setContent(html_668552315f1e6f75674defaa3e9d728e);
+            
+        
+
+        marker_62c82630461120549965347eb053bf67.bindPopup(popup_7e4363a769f1378a7ddd62bdb23341d8)
+        .openPopup();
+
+        
+    
+    
+            var marker_5ea44be5cecdebed97c6292e2271043c = L.marker(
+                [34.090698, -118.386002],
+                {}
+            ).addTo(map_e4a1680353075e813c51b818481a61f2);
+        
+    
+        var popup_0ce352f75f424e97ce2d58c33720c33e = L.popup({"autoClose": false, "maxWidth": "100%"});
+
+        
+            
+                var html_476f8f6f6196123ae4c519213aa3294c = $(`<div id="html_476f8f6f6196123ae4c519213aa3294c" style="width: 100.0%; height: 100.0%;"><div style='font-size: 10pt'>Sunset Strip</div></div>`)[0];
+                popup_0ce352f75f424e97ce2d58c33720c33e.setContent(html_476f8f6f6196123ae4c519213aa3294c);
+            
+        
+
+        marker_5ea44be5cecdebed97c6292e2271043c.bindPopup(popup_0ce352f75f424e97ce2d58c33720c33e)
+        .openPopup();
+
+        
+    
+    
+            var marker_1373fb8d29116c24c69cf20506a51ca1 = L.marker(
+                [34.118536, -118.300446],
+                {}
+            ).addTo(map_e4a1680353075e813c51b818481a61f2);
+        
+    
+        var popup_4cdfa1a40008c9c8f15aef67c30d4100 = L.popup({"autoClose": false, "maxWidth": "100%"});
+
+        
+            
+                var html_d6b7eb6ace59135f7d9f84bf802d94c5 = $(`<div id="html_d6b7eb6ace59135f7d9f84bf802d94c5" style="width: 100.0%; height: 100.0%;"><div style='font-size: 10pt'>Griffith Observatory</div></div>`)[0];
+                popup_4cdfa1a40008c9c8f15aef67c30d4100.setContent(html_d6b7eb6ace59135f7d9f84bf802d94c5);
+            
+        
+
+        marker_1373fb8d29116c24c69cf20506a51ca1.bindPopup(popup_4cdfa1a40008c9c8f15aef67c30d4100)
+        .openPopup();
+
+        
+    
+    
+            var marker_12a59d4d97308f52ca3b3344592ddf20 = L.marker(
+                [34.017583, -118.38403],
+                {}
+            ).addTo(map_e4a1680353075e813c51b818481a61f2);
+        
+    
+        var popup_5a64ca804aa71155be6f1bb243a12203 = L.popup({"autoClose": false, "maxWidth": "100%"});
+
+        
+            
+                var html_3d13c49c6f951460a2ef3303728ca2b8 = $(`<div id="html_3d13c49c6f951460a2ef3303728ca2b8" style="width: 100.0%; height: 100.0%;"><div style='font-size: 10pt'>Baldwin Hills Scenic Overlook</div></div>`)[0];
+                popup_5a64ca804aa71155be6f1bb243a12203.setContent(html_3d13c49c6f951460a2ef3303728ca2b8);
+            
+        
+
+        marker_12a59d4d97308f52ca3b3344592ddf20.bindPopup(popup_5a64ca804aa71155be6f1bb243a12203)
+        .openPopup();
+
+        
+    
+    
+            var marker_3c53f7df678563baf50f88370d4ffd41 = L.marker(
+                [34.161327, -118.167648],
+                {}
+            ).addTo(map_e4a1680353075e813c51b818481a61f2);
+        
+    
+        var popup_8c8a4ef276238922f356f4c56214ac28 = L.popup({"autoClose": false, "maxWidth": "100%"});
+
+        
+            
+                var html_2f1ae76d96eedf998215dceab84fde60 = $(`<div id="html_2f1ae76d96eedf998215dceab84fde60" style="width: 100.0%; height: 100.0%;"><div style='font-size: 10pt'>Rose Bowl Stadium</div></div>`)[0];
+                popup_8c8a4ef276238922f356f4c56214ac28.setContent(html_2f1ae76d96eedf998215dceab84fde60);
+            
+        
+
+        marker_3c53f7df678563baf50f88370d4ffd41.bindPopup(popup_8c8a4ef276238922f356f4c56214ac28)
+        .openPopup();
+
+        
+    
+    
+            var marker_87474d3899ba0f78779e38064ed5c5df = L.marker(
+                [34.073814, -118.240784],
+                {}
+            ).addTo(map_e4a1680353075e813c51b818481a61f2);
+        
+    
+        var popup_68192456ca70d010044b9590a7cdb668 = L.popup({"autoClose": false, "maxWidth": "100%"});
+
+        
+            
+                var html_a96b0008d13fa9ad39673e58aa61d5a5 = $(`<div id="html_a96b0008d13fa9ad39673e58aa61d5a5" style="width: 100.0%; height: 100.0%;"><div style='font-size: 10pt'>Dodger Stadium</div></div>`)[0];
+                popup_68192456ca70d010044b9590a7cdb668.setContent(html_a96b0008d13fa9ad39673e58aa61d5a5);
+            
+        
+
+        marker_87474d3899ba0f78779e38064ed5c5df.bindPopup(popup_68192456ca70d010044b9590a7cdb668)
+        .openPopup();
+
+        
+    
+    
+            var marker_23feb9547fc151a3d3b0be3ef039c53b = L.marker(
+                [34.112236, -118.339432],
+                {}
+            ).addTo(map_e4a1680353075e813c51b818481a61f2);
+        
+    
+        var popup_76b82e2203a95185ca7ac4fa0e206ade = L.popup({"autoClose": false, "maxWidth": "100%"});
+
+        
+            
+                var html_f401f4b115aefd7d6e52df7ff1e4863b = $(`<div id="html_f401f4b115aefd7d6e52df7ff1e4863b" style="width: 100.0%; height: 100.0%;"><div style='font-size: 10pt'>Hollywood Bowl</div></div>`)[0];
+                popup_76b82e2203a95185ca7ac4fa0e206ade.setContent(html_f401f4b115aefd7d6e52df7ff1e4863b);
+            
+        
+
+        marker_23feb9547fc151a3d3b0be3ef039c53b.bindPopup(popup_76b82e2203a95185ca7ac4fa0e206ade)
+        .openPopup();
+
+        
+    
+    
+            var marker_623df33126a0406fdf47d7031989739d = L.marker(
+                [34.055592, -118.233443],
+                {}
+            ).addTo(map_e4a1680353075e813c51b818481a61f2);
+        
+    
+        var popup_45586c71d08c158c2b6be943e74a363f = L.popup({"autoClose": false, "maxWidth": "100%"});
+
+        
+            
+                var html_55a085524420d690384a9ef4ecdd854d = $(`<div id="html_55a085524420d690384a9ef4ecdd854d" style="width: 100.0%; height: 100.0%;"><div style='font-size: 10pt'>Union Station</div></div>`)[0];
+                popup_45586c71d08c158c2b6be943e74a363f.setContent(html_55a085524420d690384a9ef4ecdd854d);
+            
+        
+
+        marker_623df33126a0406fdf47d7031989739d.bindPopup(popup_45586c71d08c158c2b6be943e74a363f)
+        .openPopup();
+
+        
+    
+    
+            var marker_87b2f872a73be9a4af2758595dfe4ddb = L.marker(
+                [34.05446, -118.25059],
+                {}
+            ).addTo(map_e4a1680353075e813c51b818481a61f2);
+        
+    
+        var popup_2c23a349fcc19849292d6df0ccedfb97 = L.popup({"autoClose": false, "maxWidth": "100%"});
+
+        
+            
+                var html_67b71f7c18f6fd237300d1ab1f2938df = $(`<div id="html_67b71f7c18f6fd237300d1ab1f2938df" style="width: 100.0%; height: 100.0%;"><div style='font-size: 10pt'>The Broad Museum</div></div>`)[0];
+                popup_2c23a349fcc19849292d6df0ccedfb97.setContent(html_67b71f7c18f6fd237300d1ab1f2938df);
+            
+        
+
+        marker_87b2f872a73be9a4af2758595dfe4ddb.bindPopup(popup_2c23a349fcc19849292d6df0ccedfb97)
+        .openPopup();
+
+        
+    
+</script>
+</html>
