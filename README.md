@@ -29,6 +29,7 @@ $n_{i}^{k}(0)=n_{i}^{k}(T)$, $u_{ij}^{k}(0)=u_{ij}^{k}(T)$, $C_{i}^{xy}(0)=C_{i}
 
 ## Extra Constraints for Parking and charging at DTLA only Scenario
 
+**$C_{1}^{xy}(t) = 0$** Cannot charge at LAX
 
 
 
