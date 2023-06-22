@@ -110,8 +110,8 @@ def number_aircrafts_lp(schedule,
     # Integrate new variables
     m.update()
 
-    m.Params.MIPGap = 0.05  # Set the optimality tolerance to 5%
-    m.Params.FeasibilityTol = 1e-7
+    # m.Params.MIPGap = 0.05  # Set the optimality tolerance to 5%
+    # m.Params.FeasibilityTol = 1e-7
     # Solve model
     m.optimize()
 
