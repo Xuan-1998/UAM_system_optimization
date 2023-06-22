@@ -24,7 +24,9 @@ $u_{12}^0(t) = u_{21}^0(t) = 0$ Cannot fly when SOC = 0. 0 is the reserved SOC
 
 ## Stationarity Condition
 T = number of timesteps + 1 + max flight time
+
 $n_{i}^{k}(0)=n_{i}^{k}(T)$, $u_{ij}^{k}(0)=u_{ij}^{k}(T)$, $C_{i}^{xy}(0)=C_{i}^{xy}(T)$
+
 ## Extra Constraints for Parking and charging at DTLA only Scenario
 
 
