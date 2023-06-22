@@ -5,7 +5,7 @@
 - $n_{i}^{k}(t)$ = \# of idle aircrafts at vertiport i of SOC k at time t
 - $u_{ij}^{k}(t)$ = \# of flights departing for vertiport j from vertiport i at time t
 - $C_{i}^{xy}(t)$ = \# of aircrafts at vertiport i that begin to charge at t with an initial SOC of x and a target SOC of y
-- $\gamma_{k}$ is the charging time needed to transition from $SOC_{k-1}$ to $SOC_{k}$
+- <span style="color:red">$\gamma_{k}$ is the charging time needed to transition from $SOC_{k-1}$ to $SOC_{k}$</span>
 - $K$ is the \# of SOCs. $K = 32$
 - $\tau_{ij}$ is the flight time from vertiport i to j
 - $\kappa_{ij}$ is the \# of SOCs dropped in flight from vertiport i to j
