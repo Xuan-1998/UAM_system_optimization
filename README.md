@@ -13,7 +13,7 @@
 The dynamic equation is then:
 
 ```math
-n_{i}^{k}(t) = n_{i}^{k}(t-1) + \sum _{j \in V-\{i\}} u_{j,i}^{k+\kappa_{ji}}(t-\tau_{ji}) - \sum_{j \in V-\{i\}} u_{ij}^{k} (t) + \sum_{x=0}^{k-1} C_{i}^{x,k} (t-\sum_{i=x+1}^{k} \gamma_{i}) - \sum_{y=k+1}^{\Gamma} C_{i}^{k,y}(t)
+n_{i}^{k}(t) = n_{i}^{k}(t-1) + \sum _{j \in V-\{i\}} u_{j,i}^{k+\kappa_{ji}}(t-\tau_{ji}) - \sum_{j \in V-\{i\}} u_{ij}^{k} (t) + \sum_{x=0}^{k-1} C_{i}^{x,k} (t-\sum_{i=x+1}^{k} \gamma_{i}) - \sum_{y=k+1}^{K} C_{i}^{k,y}(t)
 ```
 
 Therefore, an aircraft can be in one of the three states at any given point in time: (1) idle (2) charging (3) flight
