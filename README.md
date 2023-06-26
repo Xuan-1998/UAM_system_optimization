@@ -23,7 +23,11 @@ $\sum_{k \in\{1, \cdots, K\}} u_{12}^k(t) \geq f_{12}(t), \sum_{k \in\{1, \cdots
 $u_{12}^0(t) = u_{21}^0(t) = 0 \textit{  Can't fly when SOC = 0}$
 
 ### Integer Constraint
-$\begin{aligned} & n_i^k(t) \in \mathbb{Z} \\ & u_{i j}^k(t) \in \mathbb{Z} \\ & C_i^{x y}(t) \in \mathbb{Z} \\ & \kappa_{i j} \in \mathbb{Z}\end{aligned}$
+$n_i^k(t) \in \mathbb{Z}$  
+$u_{ij}^k(t) \in \mathbb{Z}$  
+$C_i^{xy}(t) \in \mathbb{Z}$  
+$\kappa_{ij} \in \mathbb{Z}$
+
 
 ### Stationarity
 
