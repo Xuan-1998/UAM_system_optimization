@@ -27,12 +27,6 @@ T = number of timesteps + 1 + max flight time
 
 $n_{i}^{k}(0)=n_{i}^{k}(T)$, $u_{ij}^{k}(0)=u_{ij}^{k}(T)$, $C_{i}^{xy}(0)=C_{i}^{xy}(T)$
 
-## Extra Constraints Parking and charging at a 3rd vertiport (vertistop) Scenario
-
-**$C_{1}^{xy}(t) = 0, C_{2}^{xy}(t) = 0$** Cannot charge at LAX and DTLA
-
-**$n_{1}^{k}(t) = 0, n_{2}^{k}(t) = 0$** Cannot park at LAX and DTLA
-
 
 ## Objective Function
 
