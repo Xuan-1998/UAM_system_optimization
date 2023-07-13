@@ -8,7 +8,7 @@ def number_aircrafts_lp(schedule,
                         schedule_time_step,
                         output_path,
                         tau=[[0, 5.92], [5.85, 0]], 
-                        kappa = [[0, 7.71875], [7.44375, 0]], 
+                        kappa = [[0, 7.71875], [7.71875, 0]], 
                         gamma = np.array([0.0129,0.0133,0.0137,0.0142,0.0147,
                                           0.0153,0.0158,0.0166,0.0172,0.018,
                                           0.0188,0.0197,0.0207,0.0219,0.0231,
@@ -17,7 +17,7 @@ def number_aircrafts_lp(schedule,
                                           0.0617,0.0726,0.0887,0.1136,0.1582,
                                           0.2622,0.9278,])*60, 
                         fixed_cost=1, 
-                        variable_cost=0.01):
+                        variable_cost=0.00001):
     
     # Flight time matrix
     tau = np.array(tau) / 5
@@ -110,7 +110,7 @@ def number_aircrafts_lp(schedule,
     # Integrate new variables
     m.update()
 
-    m.Params.MIPGap = 0.05  # Set the optimality tolerance to 5%
+    m.Params.MIPGap = 0.005  # Set the optimality tolerance to 5%
     m.Params.FeasibilityTol = 1e-7
     # Solve model
     m.optimize()
