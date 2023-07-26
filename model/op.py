@@ -392,7 +392,16 @@ def number_aircrafts_lp(schedule,
         if v.x > 0:  # Print only non-zero variables for clarity
             print('{} = {}'.format(v.varName, v.x))
 
-    print('Total Fleet Size:', (ni.sum(0, '*', '*') + uij.sum(0, '*', '*', '*') + cijk.sum(0, '*', '*', '*')).getValue())
+    # Calculate the total fleet size and store it in a variable
+    total_fleet_size = ni.sum(0, '*', '*').getValue() + uij.sum(0, '*', '*', '*').getValue() + cijk.sum(0, '*', '*', '*').getValue()
+
+    # Print the total fleet size
+    print('Total Fleet Size:', total_fleet_size)
+
+    # If you want to save it to a file, you can do something like this:
+    with open(f'../output/{output_path}_fleetsize.txt', 'w') as file:
+        file.write('Total Fleet Size: ' + str(total_fleet_size))
+
 
     # Open a file for writing
     with open(f'../output/{output_path}.txt', 'w') as file:
