@@ -37,7 +37,7 @@ def number_aircrafts_lp(schedule,
     V = [0, 1]
 
     f_values = np.zeros((T, 2, 2))
-    data = pd.read_csv(f'../input/{schedule}.csv')
+    data = schedule
     # Create 5 minute bins (24 hours * 60 minutes / 5 minute intervals)
     bins = np.arange(0, 24*60+1, 5)
 
@@ -57,6 +57,7 @@ def number_aircrafts_lp(schedule,
 
     # Create a new model
     m = Model("Vertiport_Aircraft_Routing")
+    m.setParam('OutputFlag', 0)
 
     # Create variables
     ni = m.addVars(((t, i, k) for t in range(T) for i in V for k in range(K+1)), vtype=GRB.INTEGER, name="n")
