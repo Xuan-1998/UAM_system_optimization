@@ -5,8 +5,8 @@ import numpy as np
 def number_aircrafts_lp(schedule, 
                         schedule_time_step,
                         output_path,
-                        tau=[[0, 5.92], [5.85, 0]], 
-                        kappa = [[0, 7.71875], [7.44375, 0]], 
+                        tau=[[0, 10], [10, 0]], 
+                        kappa = [[0, 10], [10, 0]], 
                         gamma = np.array([0.0129,0.0133,0.0137,0.0142,0.0147,
                                           0.0153,0.0158,0.0166,0.0172,0.018,
                                           0.0188,0.0197,0.0207,0.0219,0.0231,
@@ -37,7 +37,7 @@ def number_aircrafts_lp(schedule,
     V = [0, 1]
 
     f_values = np.zeros((T, 2, 2))
-    data = pd.read_csv(f'../input/{schedule}.csv')
+    data = schedule
     # Create 5 minute bins (24 hours * 60 minutes / 5 minute intervals)
     bins = np.arange(0, 24*60+1, 5)
 
@@ -57,6 +57,7 @@ def number_aircrafts_lp(schedule,
 
     # Create a new model
     m = Model("Vertiport_Aircraft_Routing")
+    m.setParam('OutputFlag', 0)
 
     # Create variables
     ni = m.addVars(((t, i, k) for t in range(T) for i in V for k in range(K+1)), vtype=GRB.INTEGER, name="n")
@@ -108,8 +109,8 @@ def number_aircrafts_lp(schedule,
     # Integrate new variables
     m.update()
 
-    m.Params.MIPGap = 0.05  # Set the optimality tolerance to 5%
-    m.Params.FeasibilityTol = 1e-7
+    # m.Params.MIPGap = 0.05  # Set the optimality tolerance to 5%
+    # m.Params.FeasibilityTol = 1e-7
     # Solve model
     m.optimize()
 
@@ -142,5 +143,4 @@ def number_aircrafts_lp(schedule,
 
         # Restore standard output
         sys.stdout = old_stdout
-
         
