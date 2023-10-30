@@ -134,7 +134,7 @@ def number_aircrafts_lp(schedule,
 
 
     # Open a file for writing
-    with open(f'{output_path}.txt', 'w') as file:
+    with open(os.getcwd()+output_path+'_op_result.txt', 'w') as file:
         # Redirect standard output to the file
         old_stdout = sys.stdout
         sys.stdout = file
