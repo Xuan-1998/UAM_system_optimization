@@ -3,7 +3,7 @@ import auto_regressive_demand
 importlib.reload(auto_regressive_demand)
 import auto_regressive_demand as ard
 from op import number_aircrafts_lp
-import tqdm as tqdm
+from tqdm import tqdm
 
 if __name__ == '__main__':
     schedule = ard.UAM_Schedule('/DemandUncertainty/LAX_ind.csv', '/DemandUncertainty/T_F41SCHEDULE_B43.csv')
