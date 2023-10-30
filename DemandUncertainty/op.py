@@ -125,13 +125,16 @@ def number_aircrafts_lp(schedule,
     # Print the total fleet size
     print('Total Fleet Size:', total_fleet_size)
 
+    import os
+
+
     # If you want to save it to a file, you can do something like this:
-    with open(f'../output/{output_path}_fleetsize.txt', 'w') as file:
+    with open(os.getcwd()+output_path+'_fleetsize.txt', 'w') as file:
         file.write('Total Fleet Size: ' + str(total_fleet_size))
 
 
     # Open a file for writing
-    with open(f'../output/{output_path}.txt', 'w') as file:
+    with open(f'{output_path}.txt', 'w') as file:
         # Redirect standard output to the file
         old_stdout = sys.stdout
         sys.stdout = file
