@@ -16,7 +16,7 @@ def optimize(month, day, alpha):
         
 if __name__ == '__main__':
     alpha = 0.7
-    num_processes = 8  # Number of CPU cores
+    num_processes = 24  # Number of CPU cores
     valid_dates = [(month, day, alpha) for month in range(1, 13) for day in range(1, 32) if (month == 2 and day <= 28) or (month not in [4, 6, 9, 11] or day <= 30)]
 
     with multiprocessing.Pool(num_processes) as p:
