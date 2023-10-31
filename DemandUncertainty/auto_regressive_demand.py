@@ -5,10 +5,10 @@ from utils import generate_uam_schedule, pois_generate
 import os
 class UAM_Schedule:
     def __init__(self, path_schedule, path_seatcap):
-        self.lax_flight = pd.read_csv(os.getcwd()+path_schedule)
+        self.lax_flight = pd.read_csv(path_schedule)
         self.lax_flight['T_OAG_S_DE'] = pd.to_datetime(self.lax_flight['T_OAG_S_DE'])
         self.lax_flight['T_OOOI_ARR'] = pd.to_datetime(self.lax_flight['T_OOOI_ARR'])
-        self.seatcap = pd.read_csv(os.getcwd()+path_seatcap)
+        self.seatcap = pd.read_csv(path_seatcap)
     
     def get_one_day(self, month, day, auto_regressive=None):
         month = month+201900
@@ -44,6 +44,8 @@ class UAM_Schedule:
             schedule = pd.DataFrame({'schedule': np.concatenate([lax_dtla_schedule, dtla_lax_schedule], axis=0),
                                      'od': np.concatenate([np.repeat('LAX_DTLA', len(lax_dtla_schedule)), np.repeat('DTLA_LAX', len(dtla_lax_schedule))], axis=0)})
             return schedule
+
+
 
 
 

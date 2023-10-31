@@ -1,0 +1,1 @@
+export GRB_LICENSE_FILE=/home/albert/gurobipy/gurobi.lic

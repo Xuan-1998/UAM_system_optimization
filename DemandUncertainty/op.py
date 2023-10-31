@@ -1,8 +1,10 @@
 from gurobipy import *
 import pandas as pd
 import numpy as np
+import os
+import sys
 
-def number_aircrafts_lp(schedule, 
+def number_aircrafts_lp_v2(schedule, 
                         schedule_time_step,
                         output_path,
                         tau=[[0, 10], [10, 0]], 
@@ -58,6 +60,7 @@ def number_aircrafts_lp(schedule,
     # Create a new model
     m = Model("Vertiport_Aircraft_Routing")
     m.setParam('OutputFlag', 0)
+    m.setParam('threads', 2)
 
     # Create variables
     ni = m.addVars(((t, i, k) for t in range(T) for i in V for k in range(K+1)), vtype=GRB.INTEGER, name="n")
@@ -114,11 +117,6 @@ def number_aircrafts_lp(schedule,
     # Solve model
     m.optimize()
 
-    # Print results
-    for v in m.getVars():
-        if v.x > 0:  # Print only non-zero variables for clarity
-            print('{} = {}'.format(v.varName, v.x))
-
     # Calculate the total fleet size and store it in a variable
     total_fleet_size = ni.sum(0, '*', '*').getValue() + uij.sum(0, '*', '*', '*').getValue() + cijk.sum(0, '*', '*', '*').getValue()
 
@@ -126,12 +124,10 @@ def number_aircrafts_lp(schedule,
     print('Total Fleet Size:', total_fleet_size)
 
     # If you want to save it to a file, you can do something like this:
-    with open(f'../output/{output_path}_fleetsize.txt', 'w') as file:
+    with open(output_path+'_fleetsize.txt', 'w') as file:
         file.write('Total Fleet Size: ' + str(total_fleet_size))
 
-
-    # Open a file for writing
-    with open(f'../output/{output_path}.txt', 'w') as file:
+    with open(output_path+'_op_result.txt', 'w') as file:
         # Redirect standard output to the file
         old_stdout = sys.stdout
         sys.stdout = file
@@ -140,7 +136,6 @@ def number_aircrafts_lp(schedule,
         for v in m.getVars():
             if v.x > 0:  # Print only non-zero variables for clarity
                 print('{} = {}'.format(v.varName, v.x))
-
         # Restore standard output
         sys.stdout = old_stdout
-        
+
