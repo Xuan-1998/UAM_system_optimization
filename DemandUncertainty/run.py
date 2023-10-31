@@ -7,7 +7,7 @@ import os
 
 if __name__ == '__main__':
     schedule = ard.UAM_Schedule('/DemandUncertainty/LAX_ind.csv', '/DemandUncertainty/T_F41SCHEDULE_B43.csv')
-    alpha = 0.6
+    alpha = 0.7
 
     for month in range(1, 13):
         for day in range(1, 32):
@@ -17,7 +17,7 @@ if __name__ == '__main__':
             # Here, you can perform your tasks for each valid date
             print(f"Year: 2019, Month: {month}, Day: {day}")
             one_day = schedule.get_one_day(month, day, alpha)
-            one_day.to_csv(os.getcwd() + f'/output/demand_variation/schedule/{month}_{day}_{int(alpha*10)}', index=False)
+            one_day.to_csv(os.getcwd() + f'/output/demand_variation/schedule/{month}_{day}_{int(alpha*10)}.csv', index=False)
             number_aircrafts_lp(schedule=one_day, schedule_time_step=288, output_path=f'/output/demand_variation/results/{month}_{day}_{int(alpha*10)}')
 
 
