@@ -1,18 +1,17 @@
-import importlib
-import auto_regressive_demand
-importlib.reload(auto_regressive_demand)
-import auto_regressive_demand as ard
+from UAM_Schedule import UAM_Schedule
 from op import number_aircrafts_lp_v2
 import os
 import multiprocessing
 
 def optimize(month, day, alpha):
     # Create a new instance of UAM_Schedule within each child process
-    schedule = ard.UAM_Schedule('DemandUncertainty/LAX_ind.csv', 'DemandUncertainty/T_F41SCHEDULE_B43.csv')
+    schedule = UAM_Schedule('DemandUncertainty/LAX_ind.csv', 'DemandUncertainty/T_F41SCHEDULE_B43.csv')
     print(f"Year: 2019, Month: {month}, Day: {day}")
-    one_day = schedule.get_one_day(month, day, alpha)
-    one_day.to_csv(f'output/demand_variation/schedule/{month}_{day}_{int(alpha*10)}.csv', index=False)
-    number_aircrafts_lp_v2(schedule=one_day, schedule_time_step=288, output_path=f'output/demand_variation/results/{month}_{day}_{int(alpha*10)}')
+    one_day, pax_arrival = schedule.get_one_day(month, day, alpha)
+    one_day.to_csv(f'output/demand_variation/schedule/alpha_{int(alpha*10)}/{month}_{day}.csv', index=False)
+    pax_arrival.to_csv(f'output/demand_variation/pax_arrival/alpha_{int(alpha*10)}/{month}_{day}.csv', index=False)
+
+    number_aircrafts_lp_v2(schedule=one_day, schedule_time_step=288, output_path=f'output/demand_variation/fleet_op_result/alpha_{int(alpha*10)}/{month}_{day}')
         
 if __name__ == '__main__':
     alpha = 0.7
