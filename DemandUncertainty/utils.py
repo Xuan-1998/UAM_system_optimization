@@ -70,6 +70,8 @@ def generate_uam_schedule(lax_flight_arr, lax_flight_dep, seatcap, auto_regressi
 
     schedule = pd.DataFrame({'schedule': np.concatenate([lax_dtla_sche, dtla_lax_sche], axis=0),
             'od': np.concatenate([np.repeat('LAX_DTLA', len(lax_dtla_sche)), np.repeat('DTLA_LAX', len(dtla_lax_sche))], axis=0)})
+    num_pax_per_flight = pd.DataFrame({'num_pax': np.concatenate([lax_dtla_num_pax_flight, dtla_lax_num_pax_flight], axis=0),
+            'od': np.concatenate([np.repeat('LAX_DTLA', len(lax_dtla_sche)), np.repeat('DTLA_LAX', len(dtla_lax_sche))], axis=0)})
 
     pax_arrival_times = np.concatenate([np.round(np.sort(dtla_lax)*60), np.round(np.sort(lax_dtla)*60)], axis=0)
     passenger_id = np.arange(0, len(pax_arrival_times))
@@ -77,7 +79,7 @@ def generate_uam_schedule(lax_flight_arr, lax_flight_dep, seatcap, auto_regressi
     destination = np.concatenate([np.repeat('LAX', len(dtla_lax)), np.repeat('DTLA', len(lax_dtla))], axis=0)
     paxArrivalDf = pd.DataFrame({'passenger_id':passenger_id, 'passenger_arrival_time':pax_arrival_times, 'origin_vertiport_id':origin, 'destination_vertiport_id':destination})
 
-    return schedule, paxArrivalDf
+    return schedule, paxArrivalDf, num_pax_per_flight
 
 
 def build_schedules(queue, max_waiting_time, occupancy=4):
