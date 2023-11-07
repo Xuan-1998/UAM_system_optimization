@@ -59,6 +59,7 @@ def spill_op(flight_schedule,
     # Create a new model
     m = Model("Spill Optimal Policy")
     # m.setParam('OutputFlag', 0)
+    m.setParam('MIPFocus', 3)
     m.setParam('threads', 10)
 
     # Create variables
@@ -126,8 +127,8 @@ def spill_op(flight_schedule,
     # Integrate new variables
     m.update()
 
-    m.Params.MIPGap = 0.1
-    print('optimality gap:', 0.1)  # Set the optimality tolerance to 5%
+    m.Params.MIPGap = 0.05
+    print('optimality gap:', 0.05)  # Set the optimality tolerance to 5%
     # m.Params.FeasibilityTol = 1e-7
     # Solve model
     m.optimize()
