@@ -59,8 +59,11 @@ def spill_op(flight_schedule,
     # Create a new model
     m = Model("Spill Optimal Policy")
     # m.setParam('OutputFlag', 0)
-    m.setParam('MIPFocus', 3)
-    m.setParam('threads', 10)
+    m.setParam('threads', 2)
+    m.setParam('Method', 2)
+
+    m.Params.MIPGap = 0.05
+    m.Params.FeasibilityTol = 1e-7
 
     # Create variables
     ni = m.addVars(((t, i, k) for t in range(T) for i in V for k in range(K+1)), vtype=GRB.INTEGER, name="n")
@@ -127,9 +130,6 @@ def spill_op(flight_schedule,
     # Integrate new variables
     m.update()
 
-    m.Params.MIPGap = 0.05
-    print('optimality gap:', 0.05)  # Set the optimality tolerance to 5%
-    # m.Params.FeasibilityTol = 1e-7
     # Solve model
     m.optimize()
 
@@ -140,7 +140,7 @@ def spill_op(flight_schedule,
     print('Total Spill:', total_spill)
 
     # If you want to save it to a file, you can do something like this:
-    with open(output_path+'_fleetsize.txt', 'w') as file:
+    with open(output_path+'_total_spill.txt', 'w') as file:
         file.write('Total Spill: ' + str(total_spill))
 
     with open(output_path+'_spill_op_result.txt', 'w') as file:
