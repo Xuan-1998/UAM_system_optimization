@@ -54,7 +54,6 @@ if __name__ == '__main__':
 
     with multiprocessing.Pool(num_processes) as p:
         p.starmap(optimize, valid_dates)
-        p.wait()
 
 
 

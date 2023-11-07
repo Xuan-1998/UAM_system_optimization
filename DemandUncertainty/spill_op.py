@@ -58,12 +58,12 @@ def spill_op(flight_schedule,
     
     # Create a new model
     m = Model("Spill Optimal Policy")
-    # m.setParam('OutputFlag', 0)
+    m.setParam('OutputFlag', 0)
     m.setParam('threads', 2)
     m.setParam('Method', 2)
+    m.setParam('MIPGap', 0.05)
+    m.setParam('FeasibilityTol', 1e-7)
 
-    m.Params.MIPGap = 0.05
-    m.Params.FeasibilityTol = 1e-7
 
     # Create variables
     ni = m.addVars(((t, i, k) for t in range(T) for i in V for k in range(K+1)), vtype=GRB.INTEGER, name="n")
