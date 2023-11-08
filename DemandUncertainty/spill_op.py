@@ -3,6 +3,16 @@ import pandas as pd
 import numpy as np
 import os
 import sys
+import time
+
+def time_limit_callback(model, where):
+    if where == GRB.Callback.MIP:
+        # Check the runtime
+        runtime = model.cbGet(GRB.Callback.RUNTIME)
+        # If 15 minutes have passed, stop the optimization
+        if runtime > 900: # 900 seconds = 15 minutes
+            model.terminate()
+
 
 def spill_op(flight_schedule,
             occupancy,
@@ -131,7 +141,11 @@ def spill_op(flight_schedule,
     m.update()
 
     # Solve model
+    # m.optimize(time_limit_callback)
+    start_time = time.time()
     m.optimize()
+    end_time = time.time()
+    print('Time elapsed:', end_time - start_time)
 
     # Calculate the total fleet size and store it in a variable
     total_spill = sij.sum('*', '*', '*').getValue() 

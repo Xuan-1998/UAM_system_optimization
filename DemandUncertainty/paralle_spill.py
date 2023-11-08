@@ -55,6 +55,7 @@ if __name__ == '__main__':
                     if fleetsize > i:
                         if (np.all(file_names == np.array([month,day,i]), axis=1).any() == False):
                             valid_dates.append((month, day, i, alpha))
+
     else:
         valid_dates = []
         for month in range(1, 13):
@@ -69,9 +70,10 @@ if __name__ == '__main__':
                         if fleetsize > i:
                             valid_dates.append((month, day, i, alpha))
 
+    print(f'Expecting {len(valid_dates)} runs')
+    
     with multiprocessing.Pool(num_processes) as p:
         p.starmap(optimize, valid_dates)
-        p.wait()
 
 
 
