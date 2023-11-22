@@ -1,146 +1,300 @@
 from gurobipy import *
 import pandas as pd
 import numpy as np
+import ast
+import matplotlib
+import matplotlib.pyplot as plt
+import seaborn as sns
+font = {'size'   : 24}
+matplotlib.rc('font', **font)
 
-def number_aircrafts_lp(schedule, 
-                        schedule_time_step,
-                        output_path,
-                        tau=[[0, 5.92], [5.85, 0]], 
-                        kappa = [[0, 7.71875], [7.44375, 0]], 
-                        gamma = np.array([0.0129,0.0133,0.0137,0.0142,0.0147,
-                                          0.0153,0.0158,0.0166,0.0172,0.018,
-                                          0.0188,0.0197,0.0207,0.0219,0.0231,
-                                          0.0245,0.026,0.0278,0.03,0.0323,
-                                          0.0351,0.0384,0.0423,0.0472,0.0536,
-                                          0.0617,0.0726,0.0887,0.1136,0.1582,
-                                          0.2622,0.9278,])*60, 
-                        fixed_cost=1, 
-                        variable_cost=0.00001):
-    
-    # Flight time matrix
-    tau = np.array(tau) / 5
-    tau = np.ceil(tau)
+class FleetSizeOptimizer:
+    def __init__(self, flight_time, energy_consumption, schedule, fixed_cost=1, variable_cost=0.0000001):
+        self.flight_time = np.ceil(flight_time/5).astype(int)
+        self.fixed_cost = fixed_cost
+        self.variable_cost = variable_cost
+        self.schedule_time_step = 288
+        self.soc_transition_time = np.array([0.0129,0.0133,0.0137,0.0142,0.0147,
+                                0.0153,0.0158,0.0166,0.0172,0.018,
+                                0.0188,0.0197,0.0207,0.0219,0.0231,
+                                0.0245,0.026,0.0278,0.03,0.0323,
+                                0.0351,0.0384,0.0423,0.0472,0.0536,
+                                0.0617,0.0726,0.0887,0.1136,0.1582,
+                                0.2622,0.9278,])*60
+        self.energy_consumption = np.ceil(energy_consumption/(80/len(self.soc_transition_time))).astype(int)
+        self.K = len(self.soc_transition_time)
+        self.T = int(np.max(self.flight_time)) + self.schedule_time_step + 1
+        self.V = [i for i in range(self.energy_consumption.shape[0])]
 
-    # SOC levels drop matrix
-    kappa = np.array(kappa) / (80/len(gamma))
-    kappa = np.ceil(kappa)
+        self.f_values = np.zeros((self.T, len(self.V), len(self.V)))
 
-    # Charging Time matrix
-    gamma = np.array(gamma) 
+        data = pd.read_csv(f'input/{schedule}')
+        bins = np.arange(0, 24*60+1, 5)
 
-    max_flight_time = int(np.max(tau))
+        data['time_bins'] = pd.cut(data['schedule'], bins, right=False)
+        counts = data.groupby(['od', 'time_bins']).size().unstack('od', fill_value=0)
 
-    T = schedule_time_step + 1 + max_flight_time
+        LAX_DTLA = np.array(counts['LAX_DTLA'].tolist())
+        DTLA_LAX = np.array(counts['DTLA_LAX'].tolist())
 
-    # Constants
-    K = len(gamma)
-    V = [0, 1]
+        self.LAX_DTLA = LAX_DTLA
 
-    f_values = np.zeros((T, 2, 2))
-    data = pd.read_csv(f'../input/{schedule}.csv')
-    # Create 5 minute bins (24 hours * 60 minutes / 5 minute intervals)
-    bins = np.arange(0, 24*60+1, 5)
+        for t in range(self.T-self.flight_time.max()-1):
+            self.f_values[t+1][0][1] = LAX_DTLA[t]
+            self.f_values[t+1][1][0] = DTLA_LAX[t]
 
-    # Bin the schedule data
-    data['time_bins'] = pd.cut(data['schedule'], bins, right=False)
 
-    # Group by od and time_bins, count the number of occurrences, unstack 'od' and fill NaNs with 0
-    counts = data.groupby(['od', 'time_bins']).size().unstack('od', fill_value=0)
+    def optimize(self, output_path, charging_station):
+        T = self.T
+        K = self.K
+        V = self.V
+        tau = self.flight_time
+        kappa = self.energy_consumption
+        gamma = self.soc_transition_time
+        schedule_time_step = self.schedule_time_step
+        fixed_cost = self.fixed_cost
+        variable_cost = self.variable_cost
+        f_values = self.f_values
+        max_flight_time = int(np.max(tau))
 
-    # Get the two 288 element lists
-    LAX_DTLA = np.array(counts['LAX_DTLA'].tolist())
-    DTLA_LAX = np.array(counts['DTLA_LAX'].tolist())
+        m = Model("FleetSizeOptimizer")
 
-    for t in range(T-max_flight_time-1):
-        f_values[t+1][0][1] = LAX_DTLA[t] # get the first (and only) item of the inner list
-        f_values[t+1][1][0] = DTLA_LAX[t] # get the first (and only) item of the inner list
+        # Create variables
+        ni = m.addVars(((t, i, k) for t in range(T) for i in V for k in range(K+1)), vtype=GRB.INTEGER, name="n")
+        uij = m.addVars(((t, i, j, k) for t in range(T) for i in V for j in V for k in range(K+1) if i != j), vtype=GRB.INTEGER, name="u")
+        cijk = m.addVars(((t, i, x, y) for t in range(T) for i in V for x in range(K+1) for y in range(K+1) if x < y), vtype=GRB.INTEGER, name="c")
 
-    # Create a new model
-    m = Model("Vertiport_Aircraft_Routing")
+        # Objective function
+        m.setObjective(fixed_cost*(ni.sum(0, '*', '*') + 
+                        uij.sum(0, '*', '*', '*') + 
+                        cijk.sum(0, '*', '*', '*')) + 
+                        variable_cost*(uij.sum('*', '*', '*', '*')), GRB.MINIMIZE)
 
-    # Create variables
-    ni = m.addVars(((t, i, k) for t in range(T) for i in V for k in range(K+1)), vtype=GRB.INTEGER, name="n")
-    uij = m.addVars(((t, i, j, k) for t in range(T) for i in V for j in V for k in range(K+1) if i != j), vtype=GRB.INTEGER, name="u")
-    cijk = m.addVars(((t, i, x, y) for t in range(T) for i in V for x in range(K+1) for y in range(K+1) if x < y), vtype=GRB.INTEGER, name="c")
+        # Constraint 1: Dynamic equation
+        for i in V:
+            for k in range(K+1):
+                for t in range(1, T):
+                    m.addConstr(
+                        ni[t, i, k] == ni[t-1, i, k] + 
+                        quicksum(uij[t-tau[j][i], j, i, k+kappa[j][i]] for j in V if j != i and t-1-tau[j][i] >= 0 and k+kappa[j][i] <= K) -
+                        quicksum(uij[t, i, j, k] for j in V if j != i) +
+                        quicksum(cijk[t-np.ceil(sum(gamma[x:k])/5), i, x, k] for x in range(k) if t-np.ceil(sum(gamma[x:k])/5) >= 0) -
+                        quicksum(cijk[t, i, k, y] for y in range(k+1, K+1))
+                    )
 
-    m.setObjective(fixed_cost*(ni.sum(0, '*', '*') + 
-                   uij.sum(0, '*', '*', '*') + 
-                   cijk.sum(0, '*', '*', '*')) + 
-                   variable_cost*(uij.sum('*', '*', '*', '*')), GRB.MINIMIZE)
-
-    # Dynamic equation
-    for i in V:
+        # Constraint 2: Stationary Constraint
         for k in range(K+1):
-            for t in range(1, T):
-                m.addConstr(
-                    ni[t, i, k] == ni[t-1, i, k] + 
-                    quicksum(uij[t-tau[j][i], j, i, k+kappa[j][i]] for j in V if j != i and t-1-tau[j][i] >= 0 and k+kappa[j][i] <= K) -
-                    quicksum(uij[t, i, j, k] for j in V if j != i) +
-                    quicksum(cijk[t-np.ceil(sum(gamma[x:k])/5), i, x, k] for x in range(k) if t-np.ceil(sum(gamma[x:k])/5) >= 0) -
-                    quicksum(cijk[t, i, k, y] for y in range(k+1, K+1))
-                )
-
-    # Stationary Constraint
-    for k in range(K+1):
-        for i in V:
-            m.addConstr(ni[0, i, k] == ni[schedule_time_step+max_flight_time, i, k])
-            m.addConstr(uij[0, i, 1-i, k] == uij[schedule_time_step+max_flight_time, i, 1-i, k])
-            
-    for x in range(K+1):
-        for y in range(K+1):
             for i in V:
-                if (x < y):
-                    m.addConstr(cijk[0, i, x, y] == cijk[schedule_time_step+max_flight_time, i, x, y])
-                    
-    for j in V:
-        for i in V:
-            if i != j:
-                for t in range(T-1):
-                    m.addConstr(uij.sum(t, i, j, '*') >= f_values[t][i][j])
+                for j in V:
+                    if i != j:
+                        m.addConstr(uij[0, i, j, k] == uij[schedule_time_step+max_flight_time, i, j, k])
+                        m.addConstr(ni[0, i, k] == ni[schedule_time_step+max_flight_time, i, k])
 
-    # Can't fly when SOC = 0
-    for i in V:
+        for x in range(K+1):
+            for y in range(K+1):
+                for i in V:
+                    if (x < y):
+                        m.addConstr(cijk[0, i, x, y] == cijk[schedule_time_step+max_flight_time, i, x, y])
+
+        # Constraint 3: Demand Constraint
         for j in V:
-            for t in range(T):
+            for i in V:
                 if i != j:
-                    m.addConstr(uij[t, i, j, 0] == 0)
+                    for t in range(T-1):
+                        m.addConstr(uij.sum(t, i, j, '*') >= f_values[t][i][j])
 
-    # Integrate new variables
-    m.update()
-
-    m.Params.MIPGap = 0.05  # Set the optimality tolerance to 5%
-    m.Params.FeasibilityTol = 1e-7
-    # Solve model
-    m.optimize()
-
-    # Print results
-    for v in m.getVars():
-        if v.x > 0:  # Print only non-zero variables for clarity
-            print('{} = {}'.format(v.varName, v.x))
-
-    # Calculate the total fleet size and store it in a variable
-    total_fleet_size = ni.sum(0, '*', '*').getValue() + uij.sum(0, '*', '*', '*').getValue() + cijk.sum(0, '*', '*', '*').getValue()
-
-    # Print the total fleet size
-    print('Total Fleet Size:', total_fleet_size)
-
-    # If you want to save it to a file, you can do something like this:
-    with open(f'../output/{output_path}_fleetsize.txt', 'w') as file:
-        file.write('Total Fleet Size: ' + str(total_fleet_size))
-
-
-    # Open a file for writing
-    with open(f'../output/{output_path}.txt', 'w') as file:
-        # Redirect standard output to the file
-        old_stdout = sys.stdout
-        sys.stdout = file
-        print("results")
-        # Check variable values and write them to the file
-        for v in m.getVars():
-            if v.x > 0:  # Print only non-zero variables for clarity
-                print('{} = {}'.format(v.varName, v.x))
-
-        # Restore standard output
-        sys.stdout = old_stdout
+        # Constraint 4: Energy Constraint
+        for i in V:
+            for j in V:
+                for t in range(T):
+                    if i != j:
+                        m.addConstr(uij[t, i, j, 0] == 0)
 
         
+        # Constraint 5: Charging Station Constraint
+        if len(charging_station) != self.f_values.shape[1]:
+            raise ValueError("The binary list indicating whether or not charging infrastrcture exist must be the same length as the number of vertiports")
+
+        for idx, i in enumerate(charging_station):
+            if i == False:
+                m.addConstr(cijk.sum('*', idx, '*', '*') == 0)
+                for t in range(1+self.flight_time[:,idx].max(), T+1-self.flight_time[:,idx].max()):
+                    m.addConstr(ni.sum(t, idx, '*') == 0)
+
+        
+        m.update()
+        # Gurobipy parameters
+        m.Params.MIPGap = 0.05
+        m.Params.FeasibilityTol = 1e-7
+
+        # Solve model
+        m.optimize()
+
+        self.total_fleet_size = ni.sum(0, '*', '*').getValue() + uij.sum(0, '*', '*', '*').getValue() + cijk.sum(0, '*', '*', '*').getValue()
+
+        with open(f'output/{output_path}', 'w') as file:
+            old_stdout = sys.stdout
+            sys.stdout = file
+            print("results")
+            for v in m.getVars():
+                if v.x > 0:  
+                    print('{} = {}'.format(v.varName, v.x))
+            sys.stdout = old_stdout
+
+    def parse_result(self, output_file):
+        results = pd.read_table(f'output/{output_file}')
+
+        n = results[results["results"].str.contains("n")]
+        u = results[results["results"].str.contains("u")]
+        c = results[results["results"].str.contains("c")]
+        varn = n['results'].str.split('=').apply(lambda x: x[0])
+        valn = n['results'].str.split('=').apply(lambda x: x[1])
+        t = varn.str.split('n').apply(lambda x: ast.literal_eval(x[1])).apply(lambda x: x[0])
+        i = varn.str.split('n').apply(lambda x: ast.literal_eval(x[1])).apply(lambda x: x[1])
+        k = varn.str.split('n').apply(lambda x: ast.literal_eval(x[1])).apply(lambda x: x[2])
+        amount = valn
+        specificn = pd.DataFrame(np.array([t,i,k,amount]).T).reset_index(drop=True)
+        specificn.columns = ['t','i', 'k', 'amount']
+        specificn['name'] = 'n'
+
+        varu = u['results'].str.split('=').apply(lambda x: x[0])
+        valu = u['results'].str.split('=').apply(lambda x: x[1])
+        t = varu.str.split('u').apply(lambda x: ast.literal_eval(x[1])).apply(lambda x: x[0])
+        i = varu.str.split('u').apply(lambda x: ast.literal_eval(x[1])).apply(lambda x: x[1])
+        j = varu.str.split('u').apply(lambda x: ast.literal_eval(x[1])).apply(lambda x: x[2])
+        k = varu.str.split('u').apply(lambda x: ast.literal_eval(x[1])).apply(lambda x: x[3])
+        amount = valu
+        specificu = pd.DataFrame(np.array([t,i,j,k,amount]).T).reset_index(drop=True)
+        specificu.columns = ['t','i', 'j', 'k', 'amount']
+        specificu['name'] = 'u'
+
+        varc = c['results'].str.split('=').apply(lambda x: x[0])
+        valc = c['results'].str.split('=').apply(lambda x: x[1])
+        t = varc.str.split('c').apply(lambda x: ast.literal_eval(x[1])).apply(lambda x: x[0])
+        i = varc.str.split('c').apply(lambda x: ast.literal_eval(x[1])).apply(lambda x: x[1])
+        x = varc.str.split('c').apply(lambda x: ast.literal_eval(x[1])).apply(lambda x: x[2])
+        y = varc.str.split('c').apply(lambda x: ast.literal_eval(x[1])).apply(lambda x: x[3])
+        amount = valc
+        specificc = pd.DataFrame(np.array([t,i,x,y,amount]).T).reset_index(drop=True)
+        specificc.columns = ['t','i', 'x', 'y', 'amount']
+        specificc['name'] = 'c'
+        specificn['amount'] = specificn['amount'].astype(float)
+        specificu['amount'] = specificu['amount'].astype(float)
+        specificc['amount'] = specificc['amount'].astype(float)
+
+        self.specificn = specificn
+        self.specificu = specificu
+        self.specificc = specificc
+
+
+    def __compute_states__(self, specificc, specificu, specificn):
+        end = 288 + 1 + int(np.max(self.flight_time))
+        all_c = np.zeros(shape=(1,end), dtype=int)
+        for i in range(specificc.shape[0]):
+            val = int(specificc['amount'][i])
+            soc0 = int(specificc['x'][i])
+            soc1 = int(specificc['y'][i])
+            t = int(specificc['t'][i])
+            time_charge = int(np.ceil(self.soc_transition_time[soc0: soc1].sum()/5))
+            occupied = np.zeros(shape=(val,end))
+            for j in range(val):
+                occupied[j][t:t+time_charge] = 1
+
+            all_c = np.concatenate([all_c, occupied], axis=0)
+        all_c = all_c[1:,:]
+
+        all_u = np.zeros(shape=(1,end), dtype=int)
+        for i in range(specificu.shape[0]):
+            val = int(specificu['amount'][i])
+            t = int(specificu['t'][i])
+            origin = int(specificu['i'][i])
+            dest = int(specificu['j'][i])
+            
+            flight = np.zeros(shape=(val,end))
+            for j in range(val):
+                flight[j][t:t+self.flight_time[origin, dest]] = 1
+
+            all_u = np.concatenate([all_u, flight], axis=0)
+        all_u = all_u[1:,:]
+
+        all_n = np.zeros(shape=(1,end), dtype=int)
+        for i in range(specificn.shape[0]):
+            val = int(specificn['amount'][i])
+            t = int(specificn['t'][i])
+            idle = np.zeros(shape=(val,end))
+            for j in range(val):
+                idle[j][t] = 1
+            all_n = np.concatenate([all_n, idle], axis=0)
+        all_n = all_n[1:,:]
+    
+        return all_c, all_u, all_n
+
+
+    def calculate_aircraft_states(self, idx='all'):
+        self.total_fleet_size = self.specificc[self.specificc['t'] == 0]['amount'].sum() + self.specificu[self.specificu['t'] == 0]['amount'].sum() + self.specificn[self.specificn['t'] == 0]['amount'].sum()
+
+        if idx == 'all':
+            self.all_c, self.all_u, self.all_n = self.__compute_states__(self.specificc, self.specificu, self.specificn)
+        else:
+            filtered_specificc = self.specificc[self.specificc['i'] == idx].reset_index(drop=True)
+            filtered_specificu = self.specificu[self.specificu['i'] == idx].reset_index(drop=True)
+            filtered_specificn = self.specificn[self.specificn['i'] == idx].reset_index(drop=True)
+            filtered_all_c, filtered_all_u, filtered_all_n = self.__compute_states__(filtered_specificc, filtered_specificu, filtered_specificn)
+
+            return filtered_all_c, filtered_all_u, filtered_all_n
+
+    def plot_aircraft_state(self):
+        x0 = 0
+        x1 = 291
+        fig, ax = plt.subplots(figsize=(20,8), dpi=200)
+        sns.lineplot(self.all_c.sum(axis=0)[x0:x1], label='Charging', ax=ax)
+        sns.lineplot(self.all_u.sum(axis=0)[x0:x1], label='In Flight', ax=ax)
+        sns.lineplot(self.all_n.sum(axis=0)[x0:x1], label='Idling', ax=ax)
+        sns.lineplot((self.all_c.sum(axis=0)[x0:x1] + self.all_n.sum(axis=0)[x0:x1] + self.all_u.sum(axis=0)[x0:x1]), label='All Aircraft', ax=ax)
+        ax.set(title='State of Aircraft',
+            ylabel='Number of Aircrafts',
+            xticks=np.concatenate([np.array([0,1]), np.arange(24,300, 12*2)]),
+            xticklabels=['']+[str(i)+':00' for i in range(0,25,2)])
+        plt.legend(loc='upper left', prop={'size': 16})
+        plt.grid();
+    
+    def get_summary_statistics(self, flight_miles, return_summary=False):
+        print(f"Fleet size: {self.total_fleet_size}")
+
+        vertiport_specific_pads = np.zeros(shape=(len(self.V), ), dtype=int)
+        for i in self.V:
+            filtered_all_c, filtered_all_u, filtered_all_n = self.calculate_aircraft_states(idx=i)
+            vertiport_specific_pads[i] = np.max(filtered_all_c.sum(axis=0) + filtered_all_n.sum(axis=0)).astype(int)
+
+
+        print(f"Total number of pads: {np.sum(vertiport_specific_pads)}; {vertiport_specific_pads} ")
+        print(f"Total number of flights: {self.specificu['amount'].sum()}; demand: {self.f_values.sum()}; repositioning: {self.specificu['amount'].sum()-self.f_values.sum()}")
+
+        actual_flight_number = np.zeros(shape=(len(self.V), len(self.V)))
+        for i in self.V:
+            for j in self.V:
+                if i != j:
+                    actual_flight_number[i][j] = self.specificu[(self.specificu['i'] == i) & (self.specificu['j'] == j)]['amount'].sum()
+
+        energy_consumption = self.energy_consumption @ actual_flight_number.T
+        print(f"Total energy consumption: {energy_consumption.sum()} kWh")
+
+        total_aircraft_miles = flight_miles @ actual_flight_number.T
+        print(f"Total aircraft miles: {total_aircraft_miles.sum()} mi")
+
+        revenue_aircraft_miles = flight_miles @ self.f_values.sum(axis=0).T
+        print(f"Ratio of revenue aircraft miles to aircraft miles: {revenue_aircraft_miles.sum()/total_aircraft_miles.sum()}")
+
+        if return_summary:
+            return self.total_fleet_size, np.sum(vertiport_specific_pads), vertiport_specific_pads, self.specificu['amount'].sum(), energy_consumption.sum(), total_aircraft_miles.sum(), revenue_aircraft_miles.sum()
+
+
+        
+
+
+
+    
+
+
+
+

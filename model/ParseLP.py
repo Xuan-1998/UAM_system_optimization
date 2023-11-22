@@ -5,7 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 def convert2df(output_file):
-    results = pd.read_table(f'../output/{output_file}.txt')
+    results = pd.read_table(f'output/{output_file}.txt')
     n = results[results["results"].str.contains("n")]
     u = results[results["results"].str.contains("u")]
     c = results[results["results"].str.contains("c")]
@@ -98,3 +98,4 @@ def calculate_num_aircrafts(specificc,
     all_n = all_n[1:,:]
 
     return all_c, all_n, all_u
+
