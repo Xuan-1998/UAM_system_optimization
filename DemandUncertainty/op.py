@@ -61,6 +61,7 @@ def number_aircrafts_lp_v2(schedule,
     m = Model("Vertiport_Aircraft_Routing")
     m.setParam('OutputFlag', 0)
     m.setParam('threads', 2)
+    m.setParam('MIPGap', 0.1)
 
     # Create variables
     ni = m.addVars(((t, i, k) for t in range(T) for i in V for k in range(K+1)), vtype=GRB.INTEGER, name="n")
