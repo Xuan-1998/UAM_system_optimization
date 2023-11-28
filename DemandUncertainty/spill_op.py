@@ -68,7 +68,7 @@ def spill_op(flight_schedule,
     
     # Create a new model
     m = Model("Spill Optimal Policy")
-    # m.setParam('OutputFlag', 0)
+    m.setParam('OutputFlag', 0)
     m.setParam('threads', 2)
     m.setParam('Method', 2)
     m.setParam('MIPGap', 0.05)
@@ -143,8 +143,8 @@ def spill_op(flight_schedule,
     # Solve model
     # m.optimize(time_limit_callback)
     start_time = time.time()
-    relax = m.relax()
-    relax.optimize()
+
+    m.optimize()
     end_time = time.time()
     print('Time elapsed:', end_time - start_time)
 
