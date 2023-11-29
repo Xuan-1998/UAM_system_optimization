@@ -71,7 +71,7 @@ def spill_op(flight_schedule,
     m.setParam('OutputFlag', 0)
     m.setParam('threads', 2)
     m.setParam('Method', 2)
-    m.setParam('MIPGap', 0.05)
+    m.setParam('MIPGap', 0.20)
     m.setParam('FeasibilityTol', 1e-7)
 
 
