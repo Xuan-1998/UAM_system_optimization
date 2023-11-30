@@ -118,7 +118,7 @@ class FleetSizeOptimizer:
         for idx, i in enumerate(charging_station):
             if i == False:
                 m.addConstr(cijk.sum('*', idx, '*', '*') == 0)
-                for t in range(1+self.flight_time[:,idx].max(), T+1-self.flight_time[:,idx].max()):
+                for t in range(1+self.flight_time[:,idx].max(), T-self.flight_time[:,idx].max()):
                     m.addConstr(ni.sum(t, idx, '*') == 0)
 
         
