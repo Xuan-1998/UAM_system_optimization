@@ -118,13 +118,13 @@ class FleetSizeOptimizer:
         for idx, i in enumerate(charging_station):
             if i == False:
                 m.addConstr(cijk.sum('*', idx, '*', '*') == 0)
-                for t in range(1+self.flight_time[:,idx].max(), T-self.flight_time[:,idx].max()):
-                    m.addConstr(ni.sum(t, idx, '*') == 0)
+                # for t in range(1+self.flight_time[:,idx].max(), T-self.flight_time[:,idx].max()):
+                #     m.addConstr(ni.sum(t, idx, '*') == 0)
 
         
         m.update()
         # Gurobipy parameters
-        m.Params.MIPGap = 0.1
+        m.Params.MIPGap = 0.05
         m.Params.FeasibilityTol = 1e-7
 
         # Solve model
@@ -276,14 +276,15 @@ class FleetSizeOptimizer:
                 if i != j:
                     actual_flight_number[i][j] = self.specificu[(self.specificu['i'] == i) & (self.specificu['j'] == j)]['amount'].sum()
 
-        energy_consumption = self.energy_consumption @ actual_flight_number.T
-        print(f"Total energy consumption: {energy_consumption.sum()} kWh")
+        energy_consumption = actual_flight_number @ self.energy_consumption.T
+        print(f"Total energy consumption: {energy_consumption.diagonal().sum()} kWh")
 
-        total_aircraft_miles = flight_miles @ actual_flight_number.T
-        print(f"Total aircraft miles: {total_aircraft_miles.sum()} mi")
+        total_aircraft_miles = actual_flight_number @ flight_miles.T
+        print(f"Total aircraft miles: {total_aircraft_miles.diagonal().sum()} mi")
 
-        revenue_aircraft_miles = flight_miles @ self.f_values.sum(axis=0).T
-        print(f"Ratio of revenue aircraft miles to aircraft miles: {revenue_aircraft_miles.sum()/total_aircraft_miles.sum()}")
+        revenue_aircraft_miles = self.f_values.sum(axis=0) @ flight_miles.T
+        print(f"Total revenue aircraft miles: {revenue_aircraft_miles.diagonal().sum()}")
+        print(f"Ratio of revenue aircraft miles to aircraft miles: {revenue_aircraft_miles.diagonal().sum()/total_aircraft_miles.diagonal().sum()}")
 
         if return_summary:
             return self.total_fleet_size, np.sum(vertiport_specific_pads), vertiport_specific_pads, self.specificu['amount'].sum(), energy_consumption.sum(), total_aircraft_miles.sum(), revenue_aircraft_miles.sum()
@@ -294,7 +295,6 @@ class FleetSizeOptimizer:
 
 
     
-
 
 
 
