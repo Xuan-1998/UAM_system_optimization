@@ -37,14 +37,12 @@ class FleetSizeOptimizer:
         LAX_DTLA = np.array(counts['LAX_DTLA'].tolist())
         DTLA_LAX = np.array(counts['DTLA_LAX'].tolist())
 
-        self.LAX_DTLA = LAX_DTLA
-
         for t in range(self.T-self.flight_time.max()-1):
             self.f_values[t+1][0][1] = LAX_DTLA[t]
             self.f_values[t+1][1][0] = DTLA_LAX[t]
 
 
-    def optimize(self, output_path, charging_station):
+    def optimize(self, output_path, charging_station, number_of_pads):
         T = self.T
         K = self.K
         V = self.V
@@ -121,7 +119,23 @@ class FleetSizeOptimizer:
                 # for t in range(1+self.flight_time[:,idx].max(), T-self.flight_time[:,idx].max()):
                 #     m.addConstr(ni.sum(t, idx, '*') == 0)
 
-        
+        row, col, TPRIME = self.__getVars__()
+
+        # Constraint 6: Parking Facility Constraint
+        if number_of_pads is not None:
+            for i in V:
+                for t in range(T):
+                    m.addConstr((ni.sum(t, i, '*') + 
+                    quicksum(cijk[time_adjusted, 
+                                i, 
+                                row[index], 
+                                col[index]] 
+                                for index in range(len(col))
+                                for time_adjusted in range(t-int(TPRIME[row[index], col[index]]), t)
+                                if t >= TPRIME[row[index], col[index]])+
+                    cijk.sum(t, i, '*', '*'))  <= number_of_pads[i])
+
+
         m.update()
         # Gurobipy parameters
         m.Params.MIPGap = 0.05
@@ -140,6 +154,18 @@ class FleetSizeOptimizer:
                 if v.x > 0:  
                     print('{} = {}'.format(v.varName, v.x))
             sys.stdout = old_stdout
+
+    def __getVars__(self):
+        w = np.zeros(shape=(self.K+1, self.K+1))
+        for i in range(self.K+1):
+            for j in range(self.K+1):
+                if j > i:
+                    w[i,j] = self.soc_transition_time[i:j].sum()
+        w = w // 5 + 1
+        row, col = np.where(w > 1)
+
+        return row, col, w-1
+        
 
     def parse_result(self, output_file):
         results = pd.read_table(f'output/{output_file}')
