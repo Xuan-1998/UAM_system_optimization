@@ -42,7 +42,7 @@ class FleetSizeOptimizer:
             self.f_values[t+1][1][0] = DTLA_LAX[t]
 
 
-    def optimize(self, output_path, charging_station, number_of_pads):
+    def optimize(self, output_path, charging_station, number_of_pads=None, verbose=True):
         T = self.T
         K = self.K
         V = self.V
@@ -56,6 +56,8 @@ class FleetSizeOptimizer:
         max_flight_time = int(np.max(tau))
 
         m = Model("FleetSizeOptimizer")
+        if verbose == False:
+            m.setParam('OutputFlag', 0)
 
         # Create variables
         ni = m.addVars(((t, i, k) for t in range(T) for i in V for k in range(K+1)), vtype=GRB.INTEGER, name="n")
