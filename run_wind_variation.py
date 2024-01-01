@@ -30,7 +30,6 @@ def optimize(tau, kappa, key):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--n_cores", "-n", type=int, default=32)
-    parser.add_argument("--selected", "-s", type=bool, default=False)
     args = parser.parse_args()
 
     num_processes = args.n_cores  # Number of CPU cores
@@ -77,17 +76,16 @@ if __name__ == '__main__':
     for i in range(20, 70, 10):
         for j in range(0, 270, 90):
             for k in range(10, 50, 10):
-                if args.selected:
-                    if (i in file_names[:, 0]) and (j in file_names[:, 1]) and (k in file_names[:, 2]):
-                        continue
-                    else:
-                        inputs.append((data_dict[(i, j, k)]['flight_time'], data_dict[(i, j, k)]['energy_consumption'], (i,j,k)))
+                if (i in file_names[:, 0]) and (j in file_names[:, 1]) and (k in file_names[:, 2]):
+                    continue
+                else:
+                    inputs.append((data_dict[(i, j, k)]['flight_time'], data_dict[(i, j, k)]['energy_consumption'], (i,j,k)))
         if (0 in file_names[:, 0]) and (0 in file_names[:, 1]) and (i in file_names[:, 2]):
             continue
         else:
             inputs.append((data_dict[(i, 0, 0)]['flight_time'], data_dict[(i, 0, 0)]['energy_consumption'], (i,0,0)))
 
-
+    print(f'Number of runs: {len(inputs)}')
     with multiprocessing.Pool(num_processes) as p:
         p.starmap(optimize, inputs)
 
