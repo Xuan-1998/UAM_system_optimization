@@ -1,5 +1,5 @@
 import os
-import multiprocessing.dummy as multiprocessing
+import multiprocessing
 import argparse
 import model.op
 from model.op import FleetSizeOptimizer
@@ -16,7 +16,7 @@ def optimize(tau, kappa, key):
     # kappa = data_dict[(distance_key, wind_direction_key, wind_magnitude_key)]['energy_consumption']
 
     op = FleetSizeOptimizer(flight_time=tau, energy_consumption=kappa, schedule='schedule_5min_0612.csv')
-    op.optimize(f'wind_variation/{distance_key}_{wind_direction_key}_{wind_magnitude_key}.txt', 
+    op.optimize(f'wind_variation/{distance_key}_{wind_direction_key}_{wind_magnitude_key}_.txt', 
                 charging_station=[True, True],
                 verbose=False)
     print(f'Finished {distance_key}_{wind_direction_key}_{wind_magnitude_key}')
@@ -80,7 +80,7 @@ if __name__ == '__main__':
                     continue
                 else:
                     inputs.append((data_dict[(i, j, k)]['flight_time'], data_dict[(i, j, k)]['energy_consumption'], (i,j,k)))
-        if (0 in file_names[:, 0]) and (0 in file_names[:, 1]) and (i in file_names[:, 2]):
+        if (i in file_names[:, 0]) and (0 in file_names[:, 1]) and (0 in file_names[:, 2]):
             continue
         else:
             inputs.append((data_dict[(i, 0, 0)]['flight_time'], data_dict[(i, 0, 0)]['energy_consumption'], (i,0,0)))
