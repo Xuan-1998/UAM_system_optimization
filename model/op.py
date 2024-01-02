@@ -315,12 +315,17 @@ class FleetSizeOptimizer:
         print(f"Ratio of revenue aircraft miles to aircraft miles: {revenue_aircraft_miles.diagonal().sum()/total_aircraft_miles.diagonal().sum()}")
 
         if return_summary:
-            return self.total_fleet_size, np.sum(vertiport_specific_pads), vertiport_specific_pads, self.specificu['amount'].sum(), energy_consumption.sum(), total_aircraft_miles.sum(), revenue_aircraft_miles.sum()
-
-
-        
-
-
+            summary_dict = {
+                'fleet_size': self.total_fleet_size,
+                'total_pads': np.sum(vertiport_specific_pads),
+                'pads': vertiport_specific_pads,
+                'number_of_flights': self.specificu['amount'].sum(),
+                'number_of_repositioning_flights': self.specificu['amount'].sum()-self.f_values.sum(),
+                'energy_consumption': energy_consumption.sum(),
+                'TAM': total_aircraft_miles.diagonal().sum(),
+                'RAM': revenue_aircraft_miles.diagonal().sum()
+            }
+            return summary_dict
 
     
 
