@@ -15,8 +15,8 @@ def optimize(tau, kappa, key):
     # tau = data_dict[(distance_key, wind_direction_key, wind_magnitude_key)]['flight_time']
     # kappa = data_dict[(distance_key, wind_direction_key, wind_magnitude_key)]['energy_consumption']
 
-    op = FleetSizeOptimizer(flight_time=tau, energy_consumption=kappa, schedule='schedule_5min_0612.csv')
-    op.optimize(f'wind_variation/{distance_key}_{wind_direction_key}_{wind_magnitude_key}_.txt', 
+    op = FleetSizeOptimizer(flight_time=tau, energy_consumption=kappa, schedule='schedule_5min_1000pax_0713.csv')
+    op.optimize(f'wind_variation_1000pax/{distance_key}_{wind_direction_key}_{wind_magnitude_key}_.txt', 
                 charging_station=[True, True],
                 verbose=False)
     print(f'Finished {distance_key}_{wind_direction_key}_{wind_magnitude_key}')
@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     num_processes = args.n_cores  # Number of CPU cores
 
-    directory_path = f"output/wind_variation"  # Replace with the path to your directory
+    directory_path = f"output/wind_variation_1000pax"  # Replace with the path to your directory
     file_list = os.listdir(directory_path)
     file_names = np.empty(shape=(0, 3))
     for i in file_list:
