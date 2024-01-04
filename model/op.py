@@ -140,7 +140,7 @@ class FleetSizeOptimizer:
 
         m.update()
         # Gurobipy parameters
-        m.Params.MIPGap = 0.05
+        m.Params.MIPGap = 0.08
         m.Params.FeasibilityTol = 1e-7
 
         # Solve model
