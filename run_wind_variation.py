@@ -76,11 +76,14 @@ if __name__ == '__main__':
     for i in range(20, 70, 10):
         for j in range(0, 270, 90):
             for k in range(10, 50, 10):
-                if (i in file_names[:, 0]) and (j in file_names[:, 1]) and (k in file_names[:, 2]):
+                array_to_check = np.array([i, j, k])
+                if np.any(np.all(file_names == array_to_check, axis=1)):
                     continue
                 else:
                     inputs.append((data_dict[(i, j, k)]['flight_time'], data_dict[(i, j, k)]['energy_consumption'], (i,j,k)))
-        if (i in file_names[:, 0]) and (0 in file_names[:, 1]) and (0 in file_names[:, 2]):
+        
+        array_to_check = np.array([i, 0, 0])
+        if np.any(np.all(file_names == array_to_check, axis=1)):
             continue
         else:
             inputs.append((data_dict[(i, 0, 0)]['flight_time'], data_dict[(i, 0, 0)]['energy_consumption'], (i,0,0)))
