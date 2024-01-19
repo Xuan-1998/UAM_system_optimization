@@ -9,11 +9,12 @@ font = {'size'   : 24}
 matplotlib.rc('font', **font)
 
 class FleetSizeOptimizer:
-    def __init__(self, flight_time, energy_consumption, schedule, fixed_cost=1, variable_cost=0.0000001):
-        self.flight_time = np.ceil(flight_time/5).astype(int)
+    def __init__(self, flight_time, energy_consumption, schedule, fixed_cost=1, variable_cost=0.0000001, time_step=5):
+        self.time_step = time_step
+        self.flight_time = np.ceil(flight_time/time_step).astype(int)
         self.fixed_cost = fixed_cost
         self.variable_cost = variable_cost
-        self.schedule_time_step = 288
+        self.schedule_time_step = int(1440/time_step)
         self.soc_transition_time = np.array([0.0129,0.0133,0.0137,0.0142,0.0147,
                                 0.0153,0.0158,0.0166,0.0172,0.018,
                                 0.0188,0.0197,0.0207,0.0219,0.0231,
@@ -29,7 +30,7 @@ class FleetSizeOptimizer:
         self.f_values = np.zeros((self.T, len(self.V), len(self.V)))
 
         data = pd.read_csv(f'input/{schedule}')
-        bins = np.arange(0, 24*60+1, 5)
+        bins = np.arange(0, 24*60+1, time_step)
 
         data['time_bins'] = pd.cut(data['schedule'], bins, right=False)
         counts = data.groupby(['od', 'time_bins']).size().unstack('od', fill_value=0)
@@ -78,7 +79,7 @@ class FleetSizeOptimizer:
                         ni[t, i, k] == ni[t-1, i, k] + 
                         quicksum(uij[t-tau[j][i], j, i, k+kappa[j][i]] for j in V if j != i and t-1-tau[j][i] >= 0 and k+kappa[j][i] <= K) -
                         quicksum(uij[t, i, j, k] for j in V if j != i) +
-                        quicksum(cijk[t-np.ceil(sum(gamma[x:k])/5), i, x, k] for x in range(k) if t-np.ceil(sum(gamma[x:k])/5) >= 0) -
+                        quicksum(cijk[t-np.ceil(sum(gamma[x:k])/self.time_step), i, x, k] for x in range(k) if t-np.ceil(sum(gamma[x:k])/1) >= 0) -
                         quicksum(cijk[t, i, k, y] for y in range(k+1, K+1))
                     )
 
@@ -140,7 +141,7 @@ class FleetSizeOptimizer:
 
         m.update()
         # Gurobipy parameters
-        m.Params.MIPGap = 0.08
+        m.Params.MIPGap = 0.15
         m.Params.FeasibilityTol = 1e-7
 
         # Solve model
@@ -216,14 +217,14 @@ class FleetSizeOptimizer:
 
 
     def __compute_states__(self, specificc, specificu, specificn):
-        end = 288 + 1 + int(np.max(self.flight_time))
+        end = int(1440/self.time_step) + 1 + int(np.max(self.flight_time))
         all_c = np.zeros(shape=(1,end), dtype=int)
         for i in range(specificc.shape[0]):
             val = int(specificc['amount'][i])
             soc0 = int(specificc['x'][i])
             soc1 = int(specificc['y'][i])
             t = int(specificc['t'][i])
-            time_charge = int(np.ceil(self.soc_transition_time[soc0: soc1].sum()/5))
+            time_charge = int(np.ceil(self.soc_transition_time[soc0: soc1].sum()/self.time_step))
             occupied = np.zeros(shape=(val,end))
             for j in range(val):
                 occupied[j][t:t+time_charge] = 1
