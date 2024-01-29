@@ -38,7 +38,7 @@ class UAM_Schedule:
         self.yearly_capacity = (arr_capacity, dep_capacity)
 
 
-    def get_one_day(self, month, day, auto_regressive_alpha=0):
+    def get_one_day(self, month, day, auto_regressive_alpha=0, directional_demand=1500):
         month = month+201900
         
         lax_flight_arr = self.lax_flight[(self.lax_flight['ON_YYYYMM'] == month) & (self.lax_flight['ON_DAY'] == day) & (self.lax_flight['ARR_LOCID'] == ' LAX')]
@@ -48,7 +48,7 @@ class UAM_Schedule:
         lax_flight_dep['time'] = lax_flight_dep['T_OAG_S_DE'].dt.hour * 60 + lax_flight_dep['T_OAG_S_DE'].dt.minute
         lax_flight_dep = lax_flight_dep.sort_values('time').reset_index(drop=True)
 
-        schedule, pax_arrival_times, num_pax_per_flight = generate_uam_schedule(lax_flight_arr, lax_flight_dep, self.yearly_capacity, auto_regressive_alpha)
+        schedule, pax_arrival_times, num_pax_per_flight = generate_uam_schedule(lax_flight_arr, lax_flight_dep, self.yearly_capacity, auto_regressive_alpha, directional_demand)
         
         return schedule, pax_arrival_times, num_pax_per_flight
 

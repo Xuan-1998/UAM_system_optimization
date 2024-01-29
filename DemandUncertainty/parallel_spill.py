@@ -1,5 +1,5 @@
 from UAM_Schedule import UAM_Schedule
-from spill_op import spill_op
+from op import FleetSizeOptimizer
 import os
 import multiprocessing
 import argparse
@@ -11,10 +11,13 @@ import re
 
 def optimize(month, day, fleet_size, alpha):
 
-    flight_schedule = pd.read_csv(f'output/demand_variation/schedule/alpha_{int(alpha*10)}/{month}_{day}.csv')
-    occupancy = pd.read_csv(f'output/demand_variation/schedule/alpha_{int(alpha*10)}/num_pax_{month}_{day}.csv')
+    occupancy = pd.read_csv(f'input/demand_variation/schedule/alpha_{int(alpha*10)}_demand_2500/num_pax_{month}_{day}.csv')
     print(f"Year: 2019, Month: {month}, Day: {day}, Fleet size: {fleet_size}")
-    spill_op(flight_schedule, occupancy, schedule_time_step=288, fleet_size=fleet_size, output_path=f'output/demand_variation/spill_op_result/alpha_{int(alpha*10)}/{month}_{day}_{fleet_size}')
+
+    model = FleetSizeOptimizer(flight_time=np.array([[0, 10], [10, 0]]), energy_consumption=np.array([[0, 10], [10, 0]]),
+                               schedule=f'demand_variation/schedule/alpha_{int(alpha*10)}_demand_2500/{month}_{day}.csv')
+    model.optimize(output_path=f'demand_variation/spill_op_result/alpha_{int(alpha*10)}_demand_2500/{month}_{day}_{fleet_size}',
+                   occupancy=occupancy, fleet_size=fleet_size, verbose=False, optimality_gap=0.1, spill_optimization=True, seat_capacity=4)
         
 
 
@@ -22,17 +25,17 @@ def optimize(month, day, fleet_size, alpha):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--alpha", "-a", type=float, default=0.7)
-    parser.add_argument("--n_cores", "-n", type=int, default=32)
-    parser.add_argument("--selected", "-s", type=bool, default=False)
-    parser.add_argument("--min_fleetsize", "-fsmin", type=int, default=15)
-    parser.add_argument("--max_fleetsize", "-fsmax", type=int, default=18)
+    parser.add_argument("--n_cores", "-n", type=int, default=24)
+    parser.add_argument("--selected", "-s", type=bool, default=True)
+    parser.add_argument("--min_fleetsize", "-fsmin", type=int, default=27)
+    parser.add_argument("--max_fleetsize", "-fsmax", type=int, default=33)
     args = parser.parse_args()
 
     alpha = args.alpha
     num_processes = args.n_cores  # Number of CPU cores
 
     if args.selected:
-        directory_path = f"output/demand_variation/spill_op_result/alpha_{int(alpha*10)}"  # Replace with the path to your directory
+        directory_path = f"output/demand_variation/spill_op_result/alpha_{int(alpha*10)}_demand_2500"  # Replace with the path to your directory
         file_list = os.listdir(directory_path)
         all_files = []
         for filename in file_list:
@@ -49,7 +52,7 @@ if __name__ == '__main__':
                 if (month == 2 and day > 28) or ((month in [4, 6, 9, 11]) and day > 30):
                     continue  # Skip invalid dates
             
-                with open(f'output/demand_variation/fleet_op_result/alpha_7/{month}_{day}_fleetsize.txt'.format(month, day), 'r') as f:
+                with open(f'output/demand_variation/fleet_op_result/alpha_7_demand_2500/{month}_{day}_fleetsize.txt'.format(month, day), 'r') as f:
                     fleetsize = int(float(re.search(r'\d+(\.\d+)?', f.readline())[0]))
                 for i in range(args.min_fleetsize, args.max_fleetsize+1):
                     if fleetsize > i:

@@ -5,7 +5,7 @@ import warnings
 import random
 warnings.filterwarnings('ignore')
 
-def generate_uam_schedule(lax_flight_arr, lax_flight_dep, total_lax_seats, auto_regressive_alpha, directional_demand=1500, max_waiting_time=5):
+def generate_uam_schedule(lax_flight_arr, lax_flight_dep, total_lax_seats, auto_regressive_alpha, directional_demand, max_waiting_time=5):
     
     yearly_arr_capacity, yearly_dep_capacity = total_lax_seats
     # Calculate pax demand per scheduled flight
