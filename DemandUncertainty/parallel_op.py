@@ -18,7 +18,7 @@ def optimize(month, day, alpha, demand):
 
     model = FleetSizeOptimizer(flight_time=np.array([[0, 10], [10, 0]]), energy_consumption=np.array([[0, 10], [10, 0]]), 
                                schedule=f'demand_variation/schedule/alpha_{int(alpha*10)}_demand_{demand}/{month}_{day}.csv')
-    model.optimize(output_path=f'demand_variation/fleet_op_result/alpha_{int(alpha*10)}_demand_{demand}/{month}_{day}', verbose=False, optimality_gap=0.1)
+    model.optimize(output_path=f'demand_variation/fleet_op_result/alpha_{int(alpha*10)}_demand_{demand}/{month}_{day}', verbose=False, optimality_gap=0.05)
         
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -53,7 +53,7 @@ if __name__ == '__main__':
                 if (np.all(file_names == np.array([month,day]), axis=1).any() == False):
                     valid_dates.append((month, day, alpha, demand))
     else:
-        valid_dates = [(month, day, alpha, demand) for month in range(1, 13) for day in range(1, 32) if (month == 2 and day <= 28) or (month not in [4, 6, 9, 11] or day <= 30)]
+        valid_dates = [(month, day, alpha, demand) for month in range(1, 13) for day in range(1, 32) if (month == 2 and day <= 28) or (month in [4, 6, 9, 11] and day <= 30) or (month in [1, 3, 5, 7, 8, 10, 12] and day <= 31)]
     print(f'Expecting {len(valid_dates)} runs')
 
     with multiprocessing.Pool(num_processes) as p:
