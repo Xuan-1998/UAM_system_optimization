@@ -17,7 +17,7 @@ def optimize(month, day, fleet_size, alpha):
     model = FleetSizeOptimizer(flight_time=np.array([[0, 10], [10, 0]]), energy_consumption=np.array([[0, 10], [10, 0]]),
                                schedule=f'demand_variation/schedule/alpha_{int(alpha*10)}_demand_2500/{month}_{day}.csv')
     model.optimize(output_path=f'demand_variation/spill_op_result/alpha_{int(alpha*10)}_demand_2500/{month}_{day}_{fleet_size}',
-                   occupancy=occupancy, fleet_size=fleet_size, verbose=False, optimality_gap=0.1, spill_optimization=True, seat_capacity=4)
+                   occupancy=occupancy, fleet_size=fleet_size, verbose=False, optimality_gap=0.05, spill_optimization=True, seat_capacity=4)
         
 
 
@@ -27,8 +27,8 @@ if __name__ == '__main__':
     parser.add_argument("--alpha", "-a", type=float, default=0.7)
     parser.add_argument("--n_cores", "-n", type=int, default=24)
     parser.add_argument("--selected", "-s", type=bool, default=True)
-    parser.add_argument("--min_fleetsize", "-fsmin", type=int, default=27)
-    parser.add_argument("--max_fleetsize", "-fsmax", type=int, default=33)
+    parser.add_argument("--min_fleetsize", "-fsmin", type=int, default=25)
+    parser.add_argument("--max_fleetsize", "-fsmax", type=int, default=40)
     args = parser.parse_args()
 
     alpha = args.alpha
