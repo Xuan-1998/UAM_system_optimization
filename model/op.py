@@ -116,6 +116,7 @@ class FleetSizeOptimizer:
         m = Model("FleetSizeOptimizer")
         if verbose == False:
             m.setParam('OutputFlag', 0)
+        m.setParam('threads', 2)
    
         # Create variables
         ni = m.addVars(((t, i, k) for t in range(T) for i in V for k in range(K+1)), vtype=GRB.INTEGER, name="n")
@@ -218,7 +219,10 @@ class FleetSizeOptimizer:
         # Collect results
         if spill_optimization:
             total_spill = int(sij.sum('*', '*', '*').getValue())
-            with open(output_path+'_spill_op_result.txt', 'w') as file:
+            print('The total spill is:', total_spill, 'Fleet Size:', fleet_size)
+            with open('output/'+output_path+'_total_spill.txt', 'w') as file:
+                file.write('Total Spill: ' + str(total_spill))
+            with open('output/'+output_path+'_spill_op_result.txt', 'w') as file:
                 old_stdout = sys.stdout
                 sys.stdout = file
                 print("results")
@@ -230,15 +234,17 @@ class FleetSizeOptimizer:
             return total_spill
         else:
             total_fleet_size = int(ni.sum(0, '*', '*').getValue() + uij.sum(0, '*', '*', '*').getValue() + cijk.sum(0, '*', '*', '*').getValue())
-            with open(output_path+'_fleet_op_result.txt', 'w') as file:
+            with open('output/'+output_path+'_fleetsize.txt', 'w') as file:
+                file.write('Total Fleet Size: ' + str(total_fleet_size))
+
+            with open('output/'+output_path+'_op_result.txt', 'w') as file:
                 old_stdout = sys.stdout
                 sys.stdout = file
                 print("results")
                 for v in m.getVars():
-                    if v.x > 0:  
+                    if v.x > 0: 
                         print('{} = {}'.format(v.varName, v.x))
                 sys.stdout = old_stdout
-            print('The total fleet size is:', total_fleet_size)
             return total_fleet_size
 
     def __getVars__(self):
@@ -268,6 +274,7 @@ class FleetSizeOptimizer:
         specificn = pd.DataFrame(np.array([t,i,k,amount]).T).reset_index(drop=True)
         specificn.columns = ['t','i', 'k', 'amount']
         specificn['name'] = 'n'
+
 
         varu = u['results'].str.split('=').apply(lambda x: x[0])
         valu = u['results'].str.split('=').apply(lambda x: x[1])
