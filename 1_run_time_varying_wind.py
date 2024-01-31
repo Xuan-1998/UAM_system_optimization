@@ -10,7 +10,7 @@ def optimize(run_id, flight_time, energy_consumption):
     print(f"Running {run_id}")
     model = FleetSizeOptimizer(flight_time=flight_time, energy_consumption=energy_consumption, 
                                schedule=f'ICRAT_wind/schedule_1500pax_5min_0125.csv')
-    model.optimize(output_path=f'ICRAT_wind/fleet_op_result/{run_id}', verbose=False, optimality_gap=0.05)
+    model.optimize(output_path=f'ICRAT_wind/fleet_op_result/{run_id}', verbose=False)
         
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -43,7 +43,6 @@ if __name__ == '__main__':
         valid_runs = [(run_id, params[run_id]['flight_time'], params[run_id]['energy_consumption']) for run_id in params.keys()]
  
     print(f'Expecting {len(valid_runs)} runs')
-
     with multiprocessing.Pool(num_processes) as p:
         p.starmap(optimize, valid_runs)
 
