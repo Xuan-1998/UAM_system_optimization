@@ -10,7 +10,7 @@ def optimize(run_id, flight_time, energy_consumption):
     print(f"Running {run_id}")
     model = FleetSizeOptimizer(flight_time=flight_time, energy_consumption=energy_consumption, 
                                schedule=f'ICRAT_wind/schedule_1500pax_5min_0125.csv')
-    model.optimize(output_path=f'ICRAT_wind/fleet_op_result/{run_id}', verbose=False)
+    model.optimize(output_path=f'ICRAT_wind/fleet_op_result/{run_id}', verbose=False, optimality_gap=0.1)
         
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
