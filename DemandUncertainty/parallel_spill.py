@@ -17,7 +17,7 @@ def optimize(month, day, fleet_size, alpha, demand):
     model = FleetSizeOptimizer(flight_time=np.array([[0, 10], [10, 0]]), energy_consumption=np.array([[0, 10], [10, 0]]),
                                schedule=f'demand_variation/schedule/alpha_{int(alpha*10)}_demand_{demand}/{month}_{day}.csv')
     model.optimize(output_path=f'demand_variation/spill_op_result/alpha_{int(alpha*10)}_demand_{demand}/{month}_{day}_{fleet_size}',
-                   occupancy=occupancy, fleet_size=fleet_size, verbose=False, optimality_gap=0.05, spill_optimization=True, seat_capacity=4)
+                   occupancy=occupancy, fleet_size=fleet_size, verbose=False, optimality_gap=0.1, spill_optimization=True, seat_capacity=4)
         
 
 
