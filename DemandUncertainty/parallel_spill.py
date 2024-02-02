@@ -27,7 +27,7 @@ if __name__ == '__main__':
     parser.add_argument("--alpha", "-a", type=float, default=0.7)
     parser.add_argument("--n_cores", "-n", type=int, default=24)
     parser.add_argument("--selected", "-s", type=bool, default=True)
-    parser.add_argument("--demand", "-d", type=bool, default=500)
+    parser.add_argument("--demand", "-d", type=int, default=500)
     parser.add_argument("--min_fleetsize", "-fsmin", type=int, default=25)
     parser.add_argument("--max_fleetsize", "-fsmax", type=int, default=40)
     args = parser.parse_args()

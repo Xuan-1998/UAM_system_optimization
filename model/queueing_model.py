@@ -14,7 +14,7 @@ class one_vertiport_system:
         schedule['schedule'] = np.ceil(schedule['schedule'] / 5)
         self.schedule = schedule
 
-        self.vertiport = Vertiport([aircraft(flight_time=4, charge_time=2, soc_change=20) for i in range(fleet_size)], print_log=print_log)
+        self.vertiport = Vertiport([aircraft(flight_time=2, charge_time=2, soc_change=20) for i in range(fleet_size)], print_log=print_log)
         self.arrival_curve = schedule.groupby('schedule').sum()['num_pax'].reset_index()
 
     def __update__(self, num_flight, num_pax):
