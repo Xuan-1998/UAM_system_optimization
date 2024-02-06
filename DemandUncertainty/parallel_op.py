@@ -7,7 +7,7 @@ import os
 
 
 
-def optimize(month, day, alpha, demand):
+def optimize(month, day, alpha, demand, optimality_gap):
     # Create a new instance of UAM_Schedule within each child process
     schedule = UAM_Schedule('DemandUncertainty/LAX_ind.csv', 'DemandUncertainty/T_F41SCHEDULE_B43.csv')
     print(f"Year: 2019, Month: {month}, Day: {day}")
@@ -18,13 +18,14 @@ def optimize(month, day, alpha, demand):
 
     model = FleetSizeOptimizer(flight_time=np.array([[0, 10], [10, 0]]), energy_consumption=np.array([[0, 10], [10, 0]]), 
                                schedule=f'demand_variation/schedule/alpha_{int(alpha*10)}_demand_{demand}/{month}_{day}.csv')
-    model.optimize(output_path=f'demand_variation/fleet_op_result/alpha_{int(alpha*10)}_demand_{demand}/{month}_{day}', verbose=False, optimality_gap=0.05)
+    model.optimize(output_path=f'demand_variation/fleet_op_result/alpha_{int(alpha*10)}_demand_{demand}/{month}_{day}', verbose=False, optimality_gap=optimality_gap)
         
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--alpha", "-a", type=float, default=0.7)
     parser.add_argument("--demand", "-d", type=int, default=2500)
     parser.add_argument("--n_cores", "-n", type=int, default=12)
+    parser.add_argument("--optimality_gap", "-o", type=float, default=0.05)
     parser.add_argument("--selected", "-s", type=bool, default=False)
     args = parser.parse_args()
 
@@ -32,6 +33,7 @@ if __name__ == '__main__':
     alpha = args.alpha
     num_processes = args.n_cores  # Number of CPU cores
     demand = args.demand
+    optimality_gap = args.optimality_gap
 
     if args.selected:
         directory_path = f"output/demand_variation/fleet_op_result/alpha_{int(alpha*10)}_demand_{demand}"  # Replace with the path to your directory
@@ -51,9 +53,9 @@ if __name__ == '__main__':
                 if (month == 2 and day > 28) or ((month in [4, 6, 9, 11]) and day > 30):
                     continue  # Skip invalid dates
                 if (np.all(file_names == np.array([month,day]), axis=1).any() == False):
-                    valid_dates.append((month, day, alpha, demand))
+                    valid_dates.append((month, day, alpha, demand, optimality_gap))
     else:
-        valid_dates = [(month, day, alpha, demand) for month in range(1, 13) for day in range(1, 32) if (month == 2 and day <= 28) or (month in [4, 6, 9, 11] and day <= 30) or (month in [1, 3, 5, 7, 8, 10, 12] and day <= 31)]
+        valid_dates = [(month, day, alpha, demand, optimality_gap) for month in range(1, 13) for day in range(1, 32) if (month == 2 and day <= 28) or (month in [4, 6, 9, 11] and day <= 30) or (month in [1, 3, 5, 7, 8, 10, 12] and day <= 31)]
     print(f'Expecting {len(valid_dates)} runs')
 
     with multiprocessing.Pool(num_processes) as p:
