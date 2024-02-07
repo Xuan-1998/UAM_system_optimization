@@ -1,4 +1,6 @@
 .DS_Store
 */__pycache__
 *.pyc
-*.csv
+LAX_ind.csv
+T_F41SCHEDULE_B43.csv
+processed_sfo_santacruz_20_years.csv
