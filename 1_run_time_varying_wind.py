@@ -5,25 +5,27 @@ import numpy as np
 import os
 import pickle
 
-def optimize(run_id, flight_time, energy_consumption):
+def optimize(run_id, flight_time, energy_consumption, optimality_gap):
     # Create a new instance of UAM_Schedule within each child process
     print(f"Running {run_id}")
     model = FleetSizeOptimizer(flight_time=flight_time, energy_consumption=energy_consumption, 
-                               schedule=f'ICRAT_wind/schedule_1500pax_5min_0125.csv')
-    model.optimize(output_path=f'ICRAT_wind/fleet_op_result/{run_id}', verbose=False, optimality_gap=0.1)
+                               schedule=f'icrat_wind/demand/schedule_500pax_5min_0206.csv')
+    model.optimize(output_path=f'icrat_wind/fleet_op_result/{run_id}', verbose=False, optimality_gap=optimality_gap)
         
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--n_cores", "-n", type=int, default=8)
     parser.add_argument("--selected", "-s", type=bool, default=True)
+    parser.add_argument("--optimality_gap", "-o", type=float, default=0.05)
     args = parser.parse_args()
     num_processes = args.n_cores  # Number of CPU cores
+    optimality_gap = args.optimality_gap
 
-    with open('input/wind/wind_params_updated.pkl', 'rb') as f:
+    with open('input/icrat_wind/parsed_aircraft_params.pkl', 'rb') as f:
         params = pickle.load(f)
 
     if args.selected:
-        file_list = os.listdir('output/ICRAT_wind/fleet_op_result')
+        file_list = os.listdir('output/icrat_wind/fleet_op_result')
         all_files = []
         for filename in file_list:
             if filename.endswith('_fleetsize.txt'):
@@ -35,12 +37,12 @@ if __name__ == '__main__':
 
         valid_runs = []
         for i in range(20, 160, 10):
-            for j in [500, 600, 700, 800, 900, 950, 990, 995]:
+            for j in np.arange(8):
                 if (np.all(file_names == np.array([i,j]), axis=1).any() == False):
-                    valid_runs.append((f'dist_{i}_per_{j}', params[f'dist_{i}_per_{j}']['flight_time'], params[f'dist_{i}_per_{j}']['energy_consumption']))
+                    valid_runs.append((f'dist_{i}_cluster_{j}', params[f'dist_{i}_cluster_{j}']['flight_time'], params[f'dist_{i}_cluster_{j}']['energy_consumption'], optimality_gap))
 
     else:
-        valid_runs = [(run_id, params[run_id]['flight_time'], params[run_id]['energy_consumption']) for run_id in params.keys()]
+        valid_runs = [(run_id, params[run_id]['flight_time'], params[run_id]['energy_consumption'], optimality_gap) for run_id in params.keys()]
  
     print(f'Expecting {len(valid_runs)} runs')
     with multiprocessing.Pool(num_processes) as p:
