@@ -117,7 +117,6 @@ def get_autoregressive_pax_count(arr_merged, auto_regressive_alpha):
 
 
 def auto_regressive_poisson(rate, alpha):
-    np.random.seed(0)
     lambda_0_0 = rate[0]
     x_0 = np.random.poisson(lambda_0_0)
     output = [x_0]

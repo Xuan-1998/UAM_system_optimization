@@ -48,6 +48,9 @@ class UAM_Schedule:
         lax_flight_dep['time'] = lax_flight_dep['T_OAG_S_DE'].dt.hour * 60 + lax_flight_dep['T_OAG_S_DE'].dt.minute
         lax_flight_dep = lax_flight_dep.sort_values('time').reset_index(drop=True)
 
+        self.lax_flight_arr = lax_flight_arr
+        self.lax_flight_dep = lax_flight_dep
+
         schedule, pax_arrival_times, num_pax_per_flight = generate_uam_schedule(lax_flight_arr, lax_flight_dep, self.yearly_capacity, auto_regressive_alpha, directional_demand)
         
         return schedule, pax_arrival_times, num_pax_per_flight
