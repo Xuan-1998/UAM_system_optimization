@@ -41,6 +41,8 @@ class aircraft:
             self.delay_timestep += self.flight_time
             self.soc -= self.soc_change
             self.currentVertiport = (self.currentVertiport+1)%2
+            return True
+        return False
 
     def charge(self):
         """
@@ -107,7 +109,7 @@ class system(Env):
         self.action_space = MultiDiscrete([3] * fleet_size)
         self.fleet_size = fleet_size
 
-        a = {"delay_timestep" : MultiDiscrete([5] * fleet_size), "soc": Box(1, 100, (fleet_size,)), "vertiport" : MultiDiscrete([2] * fleet_size), "vertiportPassengers" : Box(0, np.inf, (2,))}
+        a = {"delay_timestep" : MultiDiscrete([5] * fleet_size), "soc": Box(1, 100, (fleet_size,)), "vertiport" : MultiDiscrete([2] * fleet_size), "vertiportPassengers" : Box(0, np.inf, (2,), dtype=np.int32)}
         self.observation_space = Dict(a)        
         
         self.fleet = [aircraft(i, 0) for i in range(fleet_size//2)] + [aircraft(i, 1) for i in range(fleet_size - fleet_size//2)]
@@ -124,8 +126,8 @@ class system(Env):
         for i in range(len(action)): # 0: fly, 1: charge, 2: nothing
             self.fleet[i].update()
             if action[i] == 0:
-                self.fleet[i].fly()
-                flights[(self.fleet[i].currentVertiport+1)%2] += 1
+                if self.fleet[i].fly():
+                    flights[(self.fleet[i].currentVertiport+1)%2] += 1
             elif action[i] == 1:
                 self.fleet[i].charge()
         self.vertiports[0].departVehicles(flights[0])
@@ -158,5 +160,5 @@ class system(Env):
         a = {"delay_timestep" : np.array([self.fleet[i].delay_timestep for i in range(self.fleet_size)], dtype=np.int64),
              "vertiport" : np.array([self.fleet[i].currentVertiport for i in range(self.fleet_size)], dtype=np.int64),
              "soc" : np.array([self.fleet[i].soc for i in range(self.fleet_size)], dtype=np.float32),
-             "vertiportPassengers" : np.array([self.vertiports[0].passengers, self.vertiports[1].passengers], dtype=np.float32)}
+             "vertiportPassengers" : np.array([self.vertiports[0].passengers, self.vertiports[1].passengers], dtype=np.int32)}
         return a
