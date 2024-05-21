@@ -20,7 +20,7 @@ class ChargingNetwork:
         self.od_matrix = od_matrix
         self.flight_time = flight_time
         self.energy_consumption = energy_consumption
-        self.num_time_steps = num_time_steps + np.max(self.flight_time)
+        self.num_time_steps = num_time_steps + np.max(self.flight_time) + 1
         self.soc_transition_time = soc_transition_time
 
         self.num_vertiports = len(vertiports)
@@ -36,7 +36,7 @@ class ChargingNetwork:
 
     def _create_nodes(self):
         base_nodes = ['Source', 'Sink']
-        vertiport_nodes = [(v, t, k) for v in range(self.num_vertiports) for t in range(self.num_time_steps) for k in range(self.num_soc_levels+1)]
+        vertiport_nodes = [(v, t, k) for v in range(self.num_vertiports) for t in range(1, self.num_time_steps) for k in range(self.num_soc_levels+1)]
         nodes = base_nodes + vertiport_nodes
         supply = {'Source': -100, 'Sink': 100}
 
@@ -58,7 +58,7 @@ class ChargingNetwork:
     def _create_basic_edges(self):
         augmented_path = [('Source', 'Sink')]
         cost = [0]
-        source_to_vertiport = [('Source', (v, 0, k)) for v in range(self.num_vertiports) for k in range(self.num_soc_levels+1)]
+        source_to_vertiport = [('Source', (v, 1, k)) for v in range(self.num_vertiports) for k in range(self.num_soc_levels+1)]
         cost = cost + [1 for _ in range(len(source_to_vertiport))]
         vertiport_to_sink = [((v, self.num_time_steps-1, k), 'Sink') for v in range(self.num_vertiports) for k in range(self.num_soc_levels+1)]
         cost = cost + [0 for _ in range(len(vertiport_to_sink))]
@@ -67,7 +67,7 @@ class ChargingNetwork:
         return basic_edges, cost
 
     def _create_idling_edges(self):
-        idling_edges = [((v,t,k), (v,t+1,k)) for v in range(self.num_vertiports) for t in range(self.num_time_steps-1) for k in range(self.num_soc_levels+1)]
+        idling_edges = [((v,t,k), (v,t+1,k)) for v in range(self.num_vertiports) for t in range(1, self.num_time_steps-1) for k in range(self.num_soc_levels+1)]
         cost = [0 for _ in range(len(idling_edges))]
 
         return idling_edges, cost
@@ -76,11 +76,11 @@ class ChargingNetwork:
         charging_edges = []
         cost = []
         for v in range(self.num_vertiports):
-            for t in range(self.num_time_steps):
+            for t in range(1, self.num_time_steps):
                 for initial_k in range(self.num_soc_levels):
                     for final_k in range(initial_k+1, self.num_soc_levels+1):
                         charging_time = np.ceil(self.soc_transition_time[initial_k:final_k].sum()/5)
-                        if t + charging_time <= self.num_time_steps:
+                        if t + charging_time < self.num_time_steps:
                             charging_edges.append(((v,t,initial_k), (v,int(t+charging_time),final_k)))
                             cost.append(0)
 
@@ -104,7 +104,7 @@ class ChargingNetwork:
 
         flight_edges = []
         cost = []
-        for t in range(self.num_time_steps-flight_time):
+        for t in range(1, self.num_time_steps-flight_time):
             for k in range(energy_consumption, self.num_soc_levels+1):
                 flight_edges.append(((v1,t,k), (v2,t+flight_time,k-energy_consumption)))
                 cost.append(0)
