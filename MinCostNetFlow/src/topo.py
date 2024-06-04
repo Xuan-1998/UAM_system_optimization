@@ -38,7 +38,7 @@ class ChargingNetwork:
         base_nodes = ['Source', 'Sink']
         vertiport_nodes = [(v, t, k) for v in range(self.num_vertiports) for t in range(1, self.num_time_steps) for k in range(self.num_soc_levels+1)]
         nodes = base_nodes + vertiport_nodes
-        supply = {'Source': -100, 'Sink': 100}
+        supply = {'Source': -200, 'Sink': 200}
 
         return nodes, supply
 
