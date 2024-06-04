@@ -1,1 +1,4 @@
 *.csv filter=lfs diff=lfs merge=lfs -text
+output/star_network/LR/NETWORK_Gurobipy_0507.mps filter=lfs diff=lfs merge=lfs -text
+output/star_network/LR/NETWORK_Gurobipy_0529.mps filter=lfs diff=lfs merge=lfs -text
+output/star_network/LR/NETWORK_Gurobipy_0530.mps filter=lfs diff=lfs merge=lfs -text
