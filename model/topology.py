@@ -153,7 +153,7 @@ class AssignmentNetwork:
         base_nodes = ['Source', 'Sink']
         assignment_nodes = [(task.name, status) for task in self.list_of_tasks for status in ['start', 'finish']]
         nodes = base_nodes + assignment_nodes
-        supply = {'Source': -100, 'Sink': 100}
+        supply = {'Source': -200, 'Sink': 200}
 
         return nodes, supply
 

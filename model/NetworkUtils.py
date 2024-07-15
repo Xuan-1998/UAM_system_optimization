@@ -14,3 +14,6 @@ def calculate_distances_in_meters(coords):
             if i != j:
                 distance_matrix[i][j] = geodesic(coords[i], coords[j]).meters/1600
     return distance_matrix
+
+def HHI(array):
+    return np.sum(np.square(array))
