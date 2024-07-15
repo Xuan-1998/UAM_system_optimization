@@ -1,9 +1,9 @@
 import pandas as pd
 import numpy as np
-from utils import generate_uam_schedule
+from model.ScheduleUtils import generate_uam_schedule
 import os
 
-class UAM_Schedule:
+class ScheduleGenerator:
     def __init__(self, path_schedule, path_seatcap):
         self.lax_flight = pd.read_csv(path_schedule)
         self.lax_flight = self.lax_flight[(self.lax_flight['USER_CLASS'] == 'C') & (self.lax_flight['ON_YYYYMM'] <= 201912)]
