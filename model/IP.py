@@ -25,6 +25,7 @@ class FleetSizeOptimizer:
                                 0.0617,0.0726,0.0887,0.1136,0.1582,
                                 0.2622,0.9278,])*60
         self.energy_consumption = np.ceil(energy_consumption/(80/len(self.soc_transition_time))).astype(int)
+
         # Check the dimension of flight time and energy consumption. Make sure they are time-varying.
         if len(self.flight_time.shape) != len(self.energy_consumption.shape):
             raise DimensionError('The dimension of the flight time array must match the dimension of the energy consumption array')
@@ -44,13 +45,17 @@ class FleetSizeOptimizer:
 
         # Get flight values
         self.f_values = np.zeros((self.T, len(self.V), len(self.V)))
-        data = pd.read_csv(f'input/{schedule}')
-        self.flight_schedule = data
-        bins = np.arange(0, 24*60+1, time_step)
-        data['time_bins'] = pd.cut(data['schedule'], bins, right=False)
-        counts = data.groupby(['od', 'time_bins']).size().unstack('od', fill_value=0)
-        LAX_DTLA = np.array(counts['LAX_DTLA'].tolist())
-        DTLA_LAX = np.array(counts['DTLA_LAX'].tolist())
+        if type(schedule) == str:
+            data = pd.read_csv(f'{schedule}')
+            self.flight_schedule = data
+            bins = np.arange(0, 24*60+1, time_step)
+            data['time_bins'] = pd.cut(data['schedule'], bins, right=False)
+            counts = data.groupby(['od', 'time_bins']).size().unstack('od', fill_value=0)
+            LAX_DTLA = np.array(counts['LAX_DTLA'].tolist())
+            DTLA_LAX = np.array(counts['DTLA_LAX'].tolist())
+            print(LAX_DTLA.shape)
+        else:
+            LAX_DTLA, DTLA_LAX = schedule
         for t in range(self.T-self.flight_time.max()-1):
             self.f_values[t+1][0][1] = LAX_DTLA[t]
             self.f_values[t+1][1][0] = DTLA_LAX[t]
@@ -220,9 +225,9 @@ class FleetSizeOptimizer:
         if spill_optimization:
             total_spill = int(sij.sum('*', '*', '*').getValue())
             print('The total spill is:', total_spill, 'Fleet Size:', fleet_size)
-            with open('output/'+output_path+'_total_spill.txt', 'w') as file:
+            with open(output_path+'_total_spill.txt', 'w') as file:
                 file.write('Total Spill: ' + str(total_spill))
-            with open('output/'+output_path+'_spill_op_result.txt', 'w') as file:
+            with open(output_path+'_spill_op_result.txt', 'w') as file:
                 old_stdout = sys.stdout
                 sys.stdout = file
                 print("results")
@@ -234,10 +239,10 @@ class FleetSizeOptimizer:
             return total_spill
         else:
             total_fleet_size = int(ni.sum(0, '*', '*').getValue() + uij.sum(0, '*', '*', '*').getValue() + cijk.sum(0, '*', '*', '*').getValue())
-            with open('output/'+output_path+'_fleetsize.txt', 'w') as file:
+            with open(output_path+'_fleetsize.txt', 'w') as file:
                 file.write('Total Fleet Size: ' + str(total_fleet_size))
 
-            with open('output/'+output_path+'_op_result.txt', 'w') as file:
+            with open(output_path+'_op_result.txt', 'w') as file:
                 old_stdout = sys.stdout
                 sys.stdout = file
                 print("results")
