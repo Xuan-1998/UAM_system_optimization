@@ -1,5 +1,5 @@
-from UAM_Schedule import UAM_Schedule
-from op import FleetSizeOptimizer
+# from UAM_Schedule import UAM_Schedule
+from model.IP import FleetSizeOptimizer
 import os
 import multiprocessing
 import argparse
@@ -9,15 +9,27 @@ import re
 
 
 def optimize(month, day, fleet_size, alpha, demand, optimality_gap):
+    try:
+        occupancy = pd.read_csv(f'input/demand_variation/schedule/alpha_{int(alpha*10)}_demand_{demand}/num_pax_{month}_{day}.csv')
+        print(f"Year: 2019, Month: {month}, Day: {day}, Fleet size: {fleet_size}")
 
-    occupancy = pd.read_csv(f'input/demand_variation/schedule/alpha_{int(alpha*10)}_demand_{demand}/num_pax_{month}_{day}.csv')
-    print(f"Year: 2019, Month: {month}, Day: {day}, Fleet size: {fleet_size}")
-
-    model = FleetSizeOptimizer(flight_time=np.array([[0, 10], [10, 0]]), energy_consumption=np.array([[0, 10], [10, 0]]),
-                               schedule=f'demand_variation/schedule/alpha_{int(alpha*10)}_demand_{demand}/{month}_{day}.csv')
-    model.optimize(output_path=f'demand_variation/spill_op_result/alpha_{int(alpha*10)}_demand_{demand}/{month}_{day}_{fleet_size}',
-                   occupancy=occupancy, fleet_size=fleet_size, verbose=False, optimality_gap=optimality_gap, spill_optimization=True, seat_capacity=4)
-        
+        model = FleetSizeOptimizer(
+            flight_time=np.array([[0, 10], [10, 0]]),
+            energy_consumption=np.array([[0, 10], [10, 0]]),
+            schedule=f'input/demand_variation/schedule/alpha_{int(alpha*10)}_demand_{demand}/{month}_{day}.csv'
+        )
+        model.optimize(
+            output_path=f'input/demand_variation/spill_op_result/alpha_{int(alpha*10)}_demand_{demand}/{month}_{day}_{fleet_size}',
+            occupancy=occupancy,
+            fleet_size=fleet_size,
+            verbose=False,
+            optimality_gap=optimality_gap,
+            spill_optimization=True,
+            seat_capacity=4
+        )
+    except Exception as e:
+        print(f"An error occurred for Month: {month}, Day: {day}, Fleet size: {fleet_size}")
+        print(f"Error: {e}")
 
 
         

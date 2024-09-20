@@ -10,7 +10,7 @@ matplotlib.rc('font', **font)
 
 
 class FleetSizeOptimizer:
-    def __init__(self, flight_time, energy_consumption, schedule, fixed_cost=1, variable_cost=0.0000001, time_step=5):
+    def __init__(self, flight_time, energy_consumption, schedule, fixed_cost=1, variable_cost=0.00001, time_step=5):
         # Set up time-related parameters
         self.time_step = time_step 
         self.schedule_time_step = int(1440/time_step)
@@ -132,7 +132,8 @@ class FleetSizeOptimizer:
 
         # Objective function
         if spill_optimization:
-            m.setObjective(fixed_cost*sij.sum('*', '*', '*'), GRB.MINIMIZE)
+            # With spill optimization, the objective function is to minimize the fixed cost, variable cost and maximize revenue pijt*
+            m.setObjective(fixed_cost*sij.sum('*', '*', '*') + variable_cost*(uij.sum('*', '*', '*', '*')), GRB.MINIMIZE)
         else:
             m.setObjective(fixed_cost*(ni.sum(0, '*', '*') + 
                         uij.sum(0, '*', '*', '*') + 
