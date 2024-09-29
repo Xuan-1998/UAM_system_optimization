@@ -1,0 +1,1 @@
+Total Spill: 400Optimality Gap: 0.1
